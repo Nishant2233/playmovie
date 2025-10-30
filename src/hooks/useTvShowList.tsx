@@ -1,12 +1,12 @@
 import apiClient from "../services/api-client"
 import { useEffect, useState } from "react";
 
-const useTvShowList = () => {
+const useTvShowList = (page: number = 1) => {
 const [tvShows, setTvShows] = useState();
 
     const fetchTvShowList  = async () => {
         try{
-         const res = await apiClient.get("/discover/tv")
+         const res = await apiClient.get("/discover/tv", { params: { page } })
             setTvShows(res.data.results);
         
     }
@@ -17,7 +17,7 @@ const [tvShows, setTvShows] = useState();
 
 useEffect(() => {
     fetchTvShowList();
-}, []);
+}, [page]);
 return {tvShows};
 }
 

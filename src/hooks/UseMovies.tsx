@@ -14,7 +14,7 @@ export interface MovieResult{
     
 }
 
-const useMovieList = (genres? :number | null ) => {
+const useMovieList = (genres? :number | null, page: number = 1 ) => {
 
     const [movieLists, setMovieLists] = useState<MovieResult[]>();
     const fetchMovieList = async () => {
@@ -22,6 +22,7 @@ const useMovieList = (genres? :number | null ) => {
        const res = await apiClient.get("/discover/movie",{
         params: {
           with_genres: genres,
+          page,
         }
        })
        setMovieLists(res.data.results)
@@ -31,7 +32,7 @@ const useMovieList = (genres? :number | null ) => {
     }
     useEffect(() => {
       fetchMovieList();
-    }, [genres]);
+    }, [genres, page]);
 
     return {movieLists};
 }

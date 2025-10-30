@@ -112,9 +112,9 @@ const Genres = () => {
   return (
 <DropdownMenu>
   <DropdownMenuTrigger asChild>
-    <h1 className="cursor-pointer">{!genres ? "Genres": genreName}</h1>
+    <h1 className="cursor-pointer hover:text-[var(--accent)] transition-colors">{!genres ? "Genres": genreName}</h1>
   </DropdownMenuTrigger>
-  <DropdownMenuContent className="w-56">
+  <DropdownMenuContent className="w-56 bg-[#0f0f10] text-white border border-white/10 rounded-xl">
     <DropdownMenuRadioGroup value={genres}onValueChange ={onChange}>
     {genreList.map((genre) => (
 <DropdownMenuRadioItem onClick={()=> setGenreName(genre.name)} value ={genre.id}>{genre.name}</DropdownMenuRadioItem>
