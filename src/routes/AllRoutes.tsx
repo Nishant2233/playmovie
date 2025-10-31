@@ -7,6 +7,7 @@ import Player from "../components/Player";
 import TvPlayer from "../components/TvPlayer";
 import Watchlist from "../components/Watchlist";
 import TopImdb from "../components/TopImdb";
+import DetailsPage from "../pages/DetailsPage";
 
 const AllRoutes = () => {
   return(
@@ -19,6 +20,7 @@ const AllRoutes = () => {
   <Route path ="/tv/:tvId" element={<TvPlayer/>}/>
   <Route path ="/watchlist" element={<Watchlist/>}/>
   <Route path ="/top-imdb" element={<TopImdb/>}/>
+  <Route path ="/details/:type/:id" element={<DetailsPage/>}/>
  </Routes>
   );
 }

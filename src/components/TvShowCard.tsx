@@ -1,13 +1,11 @@
 
 import { Card, CardContent } from './ui/card'
 import { useNavigate } from 'react-router-dom'
-import { useDetails } from '../contex/details.context'
 import { useWatchlist } from '../contex/watchlist.context'
 
 
 const TvShowCard = ({tvShowResult}: { tvShowResult: any }) => {
   const navigate = useNavigate()
-  const { open } = useDetails()
   const { add, remove, has } = useWatchlist()
   return (
     <Card className="border-0 bg-transparent">
@@ -18,7 +16,7 @@ const TvShowCard = ({tvShowResult}: { tvShowResult: any }) => {
             alt={tvShowResult.title || tvShowResult.name || "poster"}
             loading="lazy"
             className="w-full aspect-[2/3] object-cover rounded-md cursor-pointer transition-transform duration-300 group-hover:scale-[1.02]"
-            onClick={() => open(tvShowResult.id, 'tv')}
+            onClick={() => navigate(`/details/tv/${tvShowResult.id}`)}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-md" />
           <div className="absolute top-2 left-2 text-[10px] font-bold bg-white/90 text-black px-2 py-0.5 rounded">HD</div>
@@ -36,7 +34,7 @@ const TvShowCard = ({tvShowResult}: { tvShowResult: any }) => {
                   className={`px-3 py-1.5 text-xs rounded-full font-semibold ${has(tvShowResult.id)? 'bg-green-600 text-white' : 'bg-purple-600/90 hover:bg-purple-600 text-white'}`}
                 >{has(tvShowResult.id) ? 'Added' : 'Add'}</button>
                 <button
-                  onClick={(e)=>{ e.stopPropagation(); open(tvShowResult.id, 'tv') }}
+                  onClick={(e)=>{ e.stopPropagation(); navigate(`/details/tv/${tvShowResult.id}`) }}
                   className="px-3 py-1.5 text-xs rounded-full bg-white/10 text-white border border-white/20"
                 >More</button>
               </div>

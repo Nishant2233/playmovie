@@ -22,7 +22,7 @@ const MovieCard = ({ movieResult }: Props) => {
                         alt={movieResult.title || movieResult.name || "poster"}
                         loading="lazy"
                         className="w-full aspect-[2/3] object-cover rounded-md cursor-pointer transition-transform duration-300 group-hover:scale-[1.02]"
-                        onClick={()=>{ open(movieResult.id, 'movie') }}
+                        onClick={()=>{ navigate(`/details/movie/${movieResult.id}`) }}
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-md" />
                     <div className="absolute top-2 left-2 text-[10px] font-bold bg-white/90 text-black px-2 py-0.5 rounded">HD</div>
@@ -40,7 +40,7 @@ const MovieCard = ({ movieResult }: Props) => {
                             className={`px-3 py-1.5 text-xs rounded-full font-semibold ${has(movieResult.id)? 'bg-green-600 text-white' : 'bg-purple-600/90 hover:bg-purple-600 text-white'}`}
                           >{has(movieResult.id) ? 'Added' : 'Add'}</button>
                           <button
-                            onClick={(e)=>{ e.stopPropagation(); open(movieResult.id, 'movie') }}
+                            onClick={(e)=>{ e.stopPropagation(); navigate(`/details/movie/${movieResult.id}`) }}
                             className="px-3 py-1.5 text-xs rounded-full bg-white/10 text-white border border-white/20"
                           >More</button>
                         </div>
