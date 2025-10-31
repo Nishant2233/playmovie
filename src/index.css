@@ -127,6 +127,10 @@
     background: var(--bg);
     color: var(--text);
   }
+  html {
+    /* Prevent layout shift when scrollbar appears/disappears */
+    scrollbar-gutter: stable both-edges;
+  }
 }
 
 .accent { color: var(--accent); }

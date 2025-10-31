@@ -8,6 +8,7 @@ import { GenresProvider } from './contex/genres.contex.tsx'
 import { SearchResultProvider } from './contex/searchResult.context.tsx'
 import { WatchlistProvider } from './contex/watchlist.context.tsx'
 import { DetailsProvider } from './contex/details.context.tsx'
+ 
 
 
 

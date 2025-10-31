@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import apiClient from "../services/api-client"
 import { useDetails } from "../contex/details.context"
+import { useWatchlist } from "../contex/watchlist.context"
 
 type Media = { id: number; title?: string; name?: string; backdrop_path?: string; poster_path?: string; vote_average?: number; overview?: string; release_date?: string; first_air_date?: string }
 
@@ -8,6 +9,7 @@ const HeroCarousel = () => {
   const [slides, setSlides] = useState<Media[]>([])
   const [index, setIndex] = useState(0)
   const { open } = useDetails()
+  const { add, has } = useWatchlist()
 
   useEffect(() => {
     apiClient.get('/movie/now_playing', { params: { page: 1 } }).then(r => setSlides(r.data.results?.slice(0,5) || [])).catch(()=>{})
@@ -26,9 +28,9 @@ const HeroCarousel = () => {
   const rating = current.vote_average ? current.vote_average.toFixed(1) : undefined
 
   return (
-    <div className="relative w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden -mt-20">
       {/* Backdrop slideshow */}
-      <div className="relative aspect-[16/6] lg:aspect-[16/5]">
+      <div className="relative aspect-[16/7] lg:aspect-[16/6]">
         {slides.map((s, i) => (
           <img key={s.id} src={`https://image.tmdb.org/t/p/original${s.backdrop_path}`} alt={title} className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i===index?'opacity-100':'opacity-0'}`} />
         ))}
@@ -62,10 +64,12 @@ const HeroCarousel = () => {
             <p className="text-neutral-300 max-w-3xl line-clamp-3 md:line-clamp-none">{current.overview}</p>
           </div>
           <div className="hidden md:flex items-center gap-4">
-            <button className="px-6 h-11 rounded-full bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:opacity-90 font-semibold">Mark as Watched</button>
-            <button className="px-6 h-11 rounded-full bg-white/10 hover:bg-white/15 border border-white/20 flex items-center gap-2">
-              <span>☆</span>
-              <span>Add to Collection</span>
+            <button
+              onClick={()=> add({ id: current.id, title, poster_path: current.poster_path || "", backdrop_path: current.backdrop_path })}
+              disabled={has(current.id)}
+              className={`px-6 h-11 rounded-full font-semibold ${has(current.id) ? 'bg-purple-600/60 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700'}`}
+            >
+              {has(current.id) ? 'Added to Watchlist' : 'Add to Watchlist'}
             </button>
           </div>
         </div>

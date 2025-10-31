@@ -4,26 +4,30 @@ import MovieCard from "./MovieCard"
 import { GenresContext } from "../contex/genres.contex"
 import { useSearchParams } from "react-router-dom"
 import Pagination from "./Pagination"
+import Genres from "./Genres"
 
 
 const MovieList = () => {
   const{ genres }= useContext(GenresContext)
   const [params] = useSearchParams()
   const page = Number(params.get('page') || 1)
-  const { movieLists } = useMovieList(genres, page)
+  const { movieLists, totalPages } = useMovieList(genres, page)
   console.log(movieLists)
 
   return (
-    <div className="p-3 mb-4">
-      <h1 className="text-4xl font-semibold p-5 py-8">Movies</h1> 
-    <div className="grid lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-2 gap-4">
+    <div className="px-5 md:px-10 mb-10">
+      <div className="flex items-center justify-between py-8">
+        <h1 className="text-4xl font-semibold">Movies</h1>
+        <div className="hidden md:block"><Genres /></div>
+      </div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
       {movieLists?.map((movieList: any) => (
         <div key={movieList.id}>
           <MovieCard movieResult={movieList} />
         </div>
       ))}
     </div>
-    <Pagination total={5} />
+    <Pagination total={Math.min(500, totalPages || 1)} />
     </div>
   )
 

@@ -38,39 +38,45 @@ const Navbar = () => {
   return (
    <header className={`sticky top-0 z-30 ${solid? 'bg-transparent' : 'bg-transparent'} transition-all duration-300 ${hidden? '-translate-y-full' : 'translate-y-0'}`}>
      <div className="px-4 md:px-10 h-20 flex items-center justify-between gap-4">
-       <div className="flex items-center gap-3">
-         <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer elevate" onClick={()=> navigate('/')} />
-       </div>
+      <div className="hidden md:flex items-center justify-center flex-1">
+        <div className="px-3 py-2 rounded-[2rem] bg-[#0b0b0b]/70 border border-white/10 backdrop-blur flex items-center gap-1 w-full max-w-6xl">
+          {/* Logo inside the unified navbar */}
+          <button onClick={()=> navigate('/')} className="shrink-0 mr-2">
+            <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer elevate" />
+          </button>
 
-       <div className="hidden md:flex items-center justify-center flex-1">
-         <div className="px-3 py-2 rounded-[2rem] bg-[#0b0b0b]/80 border border-white/10 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] flex items-center gap-1">
+          {/* Primary links */}
            {[
              {to:'/',label:'Home'},
              {to:'/movies',label:'Movies'},
              {to:'/tvshows',label:'TV Shows'},
              {to:'/top-imdb',label:'Top IMDb'}
            ].map(link => (
-             <NavLink key={link.to} to={link.to} className={({isActive})=>`relative px-4 py-2 rounded-xl transition-colors ${isActive? 'text-white' : 'text-white/80 hover:text-white'}`}>
+            <NavLink key={link.to} to={link.to} className={({isActive})=>`relative px-4 py-2 rounded-xl transition-colors ${isActive? 'text-white' : 'text-white/80 hover:text-white'}`}>
                {({isActive}) => (
                  <span className="relative">{link.label}
-                   <span className={`absolute -bottom-1 left-0 right-0 h-[3px] rounded-full bg-gradient-to-r from-purple-500 to-sky-500 transition-opacity ${isActive? 'opacity-100' : 'opacity-0 group-hover:opacity-80'}`}></span>
+                  <span className={`absolute -bottom-1 left-0 right-0 h-[2px] rounded-full bg-purple-600 transition-opacity ${isActive? 'opacity-100' : 'opacity-0 group-hover:opacity-80'}`}></span>
                  </span>
                )}
              </NavLink>
            ))}
            <div className="px-3 py-2"><Genres /></div>
-         </div>
-       </div>
 
-       <div className="hidden md:flex items-center gap-3">
-         <Link to="/watchlist" className="px-4 py-2 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-sm font-semibold">Watchlist</Link>
-         <form onSubmit={handleSubmit}>
-           <div className="relative w-64">
-             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
-             <Input type="text" placeholder="Search" className="pl-9 border-gray-700 bg-[#0f0f0f] rounded-2xl w-64"
-              value={searchText} onChange={handleChange} />
-           </div>
-         </form>
+          {/* Spacer to push utilities to right inside same bar */}
+          <div className="flex-1" />
+
+          {/* Search inside unified navbar */}
+          <form onSubmit={handleSubmit} className="hidden md:block">
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
+              <Input type="text" placeholder="Search" className="pl-9 border-gray-700 bg-[#0f0f0f] rounded-2xl w-64"
+               value={searchText} onChange={handleChange} />
+            </div>
+          </form>
+
+          {/* Watchlist inside unified navbar */}
+          <Link to="/watchlist" className="ml-2 px-4 py-2 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-sm font-semibold shrink-0">Watchlist</Link>
+         </div>
        </div>
 
        <button className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-white/20" onClick={()=> setOpen(!open)} aria-label="Menu">≡</button>

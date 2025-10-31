@@ -1,16 +1,31 @@
 import { useMemo } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 
-const Pagination = ({ total = 5 }: { total?: number }) => {
+type Props = {
+  total?: number
+  page?: number
+  onChange?: (page: number) => void
+}
+
+const Pagination = ({ total = 5, page: controlledPage, onChange }: Props) => {
   const [params] = useSearchParams()
   const navigate = useNavigate()
-  const page = Number(params.get('page') || 1)
-  const pages = useMemo(() => Array.from({ length: total }, (_, i) => i + 1), [total])
+  const page = controlledPage ?? Number(params.get('page') || 1)
+  const pages = useMemo(() => {
+    const windowSize = 5
+    const start = Math.floor((page - 1) / windowSize) * windowSize + 1
+    const end = Math.min(total, start + windowSize - 1)
+    return Array.from({ length: Math.max(0, end - start + 1) }, (_, i) => start + i)
+  }, [total, page])
 
   const go = (p: number) => {
-    const next = new URLSearchParams(params)
-    next.set('page', String(p))
-    navigate({ search: next.toString() })
+    if (onChange) {
+      onChange(p)
+    } else {
+      const next = new URLSearchParams(params)
+      next.set('page', String(p))
+      navigate({ search: next.toString() })
+    }
   }
 
   return (
@@ -20,7 +35,7 @@ const Pagination = ({ total = 5 }: { total?: number }) => {
         <button
           key={p}
           onClick={() => go(p)}
-          className={`w-9 h-9 rounded-full flex items-center justify-center ${p===page ? 'bg-[var(--accent)] text-white' : 'text-white/90 hover:underline'}`}
+          className={`w-9 h-9 rounded-full flex items-center justify-center ${p===page ? 'bg-purple-600 text-white' : 'text-white/90 hover:underline'}`}
         >{p}</button>
       ))}
       <button onClick={() => go(Math.min(total, page + 1))} aria-label="Next">»</button>

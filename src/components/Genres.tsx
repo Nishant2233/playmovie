@@ -2,9 +2,7 @@ import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu"
 import {
   DropdownMenu,
   DropdownMenuContent,
-
     DropdownMenuRadioItem,
-  
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu"
 import { useContext, useState } from "react"
@@ -97,14 +95,15 @@ const genreList =  [
 const Genres = () => {
    
    const { genres, setGenres }=useContext (GenresContext)
-   const[genreName, setGenreName]= useState()
+   const[genreName, setGenreName]= useState<string | undefined>()
 
     console.log(genres);
     const navigate = useNavigate();
     console.log(genreName);
    
-     const onChange = (data)=>{
-       setGenres (data);
+     const onChange = (data: string)=>{
+       const id = Number(data)
+       if (!Number.isNaN(id)) setGenres (id);
        navigate("/movies");
      }
 
@@ -114,12 +113,18 @@ const Genres = () => {
   <DropdownMenuTrigger asChild>
     <h1 className="cursor-pointer hover:text-[var(--accent)] transition-colors">{!genres ? "Genres": genreName}</h1>
   </DropdownMenuTrigger>
-  <DropdownMenuContent className="w-56 bg-[#0f0f10] text-white border border-white/10 rounded-xl">
-    <DropdownMenuRadioGroup value={genres}onValueChange ={onChange}>
+  <DropdownMenuContent align="start" sideOffset={12} className="w-[760px] max-w-[90vw] p-4 bg-[#0f0f10] text-white border border-white/10 rounded-xl shadow-2xl">
+    <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+      <DropdownMenuRadioGroup value={(genres ?? '').toString()} onValueChange={onChange}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-3 gap-x-8">
     {genreList.map((genre) => (
-<DropdownMenuRadioItem onClick={()=> setGenreName(genre.name)} value ={genre.id}>{genre.name}</DropdownMenuRadioItem>
-    )) }
+            <DropdownMenuRadioItem key={genre.id} onClick={()=> setGenreName(genre.name)} value={String(genre.id)} className="cursor-pointer data-[state=checked]:text-purple-400 focus:bg-white/5 rounded px-2 py-1">
+              {genre.name}
+            </DropdownMenuRadioItem>
+          ))}
+        </div>
     </DropdownMenuRadioGroup>
+    </div>
   </DropdownMenuContent>
 </DropdownMenu>  )
 }
