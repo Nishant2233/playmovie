@@ -48,6 +48,6 @@ const MovieCard = ({ movieResult }: Props) => {
                 </div>
             </CardContent>
         </Card>
-    )
+  );
 }
 export default MovieCard
