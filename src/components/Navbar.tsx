@@ -4,7 +4,7 @@ import Genres from "./Genres"
 import { Input } from "./ui/input"
 import {Link, NavLink, useNavigate} from "react-router-dom"
 import { useContext, useEffect, useState } from "react"
-import { SearchResultContext } from "../contex/searchResult.Context";
+import { SearchResultContext } from "../contex/searchResult.context";
 import { Search } from "lucide-react"
 
 const Navbar = () => {
