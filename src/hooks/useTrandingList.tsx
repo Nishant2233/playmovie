@@ -3,7 +3,7 @@ import apiClient from "../services/api-client"
 
 
 const useTrandingList = (tranding: string="movie") => {
-  const[trandingData ,setTrandingData]=useState();
+  const[trandingData ,setTrandingData]=useState<any[] | undefined>(undefined);
     const fetchTrandingList = async () => {
         try{
      const res = await apiClient.get(`/trending/${tranding}/day`)

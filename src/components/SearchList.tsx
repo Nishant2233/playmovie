@@ -1,5 +1,5 @@
-import React, { useContext } from 'react'
-import { SearchResultContext } from '../contex/searchResult.Context'
+import { useContext } from 'react'
+import { SearchResultContext } from '../contex/searchResult.context'
 import useMultiSearch from '../hooks/useMultiSearch'
 import MovieCard from './MovieCard'
 import TvShowCard from './TvShowCard'

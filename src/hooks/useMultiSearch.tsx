@@ -1,6 +1,6 @@
 import apiClient from "../services/api-client"
 import { useContext, useEffect } from "react";
-import { SearchResultContext } from "../contex/searchResult.Context";
+import { SearchResultContext } from "../contex/searchResult.context";
 
 
 const useMultiSearch = (input : string) => {
