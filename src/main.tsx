@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { BrowserRouter } from 'react-router-dom'
-import Genres from './components/Genres.tsx'
+ 
 import { GenresProvider } from './contex/genres.contex.tsx'
 import { SearchResultProvider } from './contex/searchResult.context.tsx'
 import { WatchlistProvider } from './contex/watchlist.context.tsx'

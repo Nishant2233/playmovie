@@ -1,14 +1,14 @@
 import React, { createContext, useState } from "react";
 
 export const GenresContext = createContext<{genres: number | null;
-    setGenres: (data: number)=> void;
+    setGenres: (data: number | null)=> void;
 }>({
     genres: null,
     setGenres: () => {}
 });
 
 export const GenresProvider = ({ children }: { children: React.ReactNode }) => {
-    const [genres, setGenres] = useState(null);
+    const [genres, setGenres] = useState<number | null>(null);
     const value = { genres, setGenres };
 
     return (    

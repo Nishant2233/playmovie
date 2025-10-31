@@ -1,4 +1,4 @@
-import React, { use, useContext } from 'react'
+import React, { useContext } from 'react'
 import { SearchResultContext } from '../contex/searchResult.Context'
 import useMultiSearch from '../hooks/useMultiSearch'
 import MovieCard from './MovieCard'
@@ -11,7 +11,7 @@ const SearchList = () => {
 
   return (
     <div className="px-5 md:px-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-10">
-     {searchData?.map((data)=>{
+     {searchData?.map((data: any)=>{
          return(
         <div key={data.id}>
         {data.media_type==="movie"?(
