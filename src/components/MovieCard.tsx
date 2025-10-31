@@ -2,7 +2,6 @@ import { Card, CardContent } from "./ui/card"
 import type { MovieResult } from "../hooks/UseMovies"
 import { useNavigate } from "react-router-dom"
 import { useWatchlist } from "../contex/watchlist.context"
-import { useDetails } from "../contex/details.context"
 
 interface Props{
     movieResult: MovieResult
@@ -12,7 +11,6 @@ interface Props{
 const MovieCard = ({ movieResult }: Props) => {
     const navigate = useNavigate()
     const { add, remove, has } = useWatchlist()
-    const { open } = useDetails()
     return (
         <Card className="border-0 bg-transparent">
             <CardContent className="px-0">
