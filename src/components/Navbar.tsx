@@ -2,13 +2,14 @@
 import pmlogo from "../assets/pmlogo.jpg"
 import Genres from "./Genres"
 import { Input } from "./ui/input"
-import {Link, NavLink, useNavigate} from "react-router-dom"
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom"
 import { useContext, useEffect, useState } from "react"
-import { SearchResultContext } from "../contex/searchResult.context";
+import { SearchResultContext } from "../contex/searchResult.context"
 import { Search } from "lucide-react"
 
 const Navbar = () => {
   const navigate=useNavigate()
+  const location = useLocation()
   const {searchText,setSearchText}=useContext(SearchResultContext)
   const [open, setOpen] = useState(false)
   const [solid, setSolid] = useState(false)
@@ -28,26 +29,28 @@ const Navbar = () => {
    setSearchText(e.target.value)
     navigate(`/search/${e.target.value}`)
     if(e.target.value.length===0){
-      navigate("/movies")
+      navigate("/home")
     }
   }
   const handleSubmit=(e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault();
     navigate(`/search/${searchText}`)
   }
+  // hide navbar on the welcome page
+  if (location.pathname === "/") return null
   return (
    <header className={`sticky top-0 z-30 ${solid? 'bg-transparent' : 'bg-transparent'} transition-all duration-300 ${hidden? '-translate-y-full' : 'translate-y-0'}`}>
      <div className="px-4 md:px-10 h-20 flex items-center justify-between gap-4">
       <div className="hidden md:flex items-center justify-center flex-1">
         <div className="px-3 py-2 rounded-[2rem] bg-[#0b0b0b]/70 border border-white/10 backdrop-blur flex items-center gap-1 w-full max-w-6xl">
           {/* Logo inside the unified navbar */}
-          <button onClick={()=> navigate('/')} className="shrink-0 mr-2">
+          <button onClick={()=> navigate('/home')} className="shrink-0 mr-2">
             <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer elevate" />
           </button>
 
           {/* Primary links */}
            {[
-             {to:'/',label:'Home'},
+             {to:'/home',label:'Home'},
              {to:'/movies',label:'Movies'},
              {to:'/tvshows',label:'TV Shows'},
              {to:'/top-imdb',label:'Top IMDb'}
@@ -75,7 +78,7 @@ const Navbar = () => {
           </form>
 
           {/* Watchlist inside unified navbar */}
-          <Link to="/watchlist" className="ml-2 px-4 py-2 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-sm font-semibold shrink-0">Watchlist</Link>
+           <Link to="/watchlist" className="ml-2 px-4 py-2 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-sm font-semibold shrink-0">Watchlist</Link>
          </div>
        </div>
 
@@ -91,7 +94,7 @@ const Navbar = () => {
            </div>
          </form>
          <div className="grid gap-3 text-sm">
-           <Link to="/" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Home</Link>
+           <Link to="/home" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Home</Link>
            <Link to="/movies" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Movies</Link>
            <Link to="/tvshows" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">TV Shows</Link>
            <Link to="/top-imdb" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Top IMDb</Link>

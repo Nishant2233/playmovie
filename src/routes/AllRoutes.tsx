@@ -8,11 +8,13 @@ import TvPlayer from "../components/TvPlayer";
 import Watchlist from "../components/Watchlist";
 import TopImdb from "../components/TopImdb";
 import DetailsPage from "../pages/DetailsPage";
+import Welcome from "../pages/Welcome";
 
 const AllRoutes = () => {
   return(
  <Routes>
-  <Route path="/" element={<Tranding/>}/>
+  <Route path="/" element={<Welcome/>}/>
+  <Route path="/home" element={<Tranding/>}/>
   <Route path ="/movies" element = {<MOvieList/>}/>
   <Route path ="/tvshows" element ={<TvShowList/>}/>
   <Route path ="/search/:searchName/" element={<SearchList/>}/>
