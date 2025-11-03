@@ -44,7 +44,7 @@ const EnhancedPlayer = () => {
   const [relatedVideos, setRelatedVideos] = useState<any[]>([]);
   const [viewers, setViewers] = useState<number>(Math.floor(Math.random() * 15000) + 5000);
   const [progress, setProgress] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(5432); // 90:32 in seconds
+  const [duration] = useState<number>(5432); // 90:32 in seconds
   
   // Available servers
   const servers = [
@@ -404,7 +404,7 @@ const EnhancedPlayer = () => {
           <div className="h-[calc(100vh-64px)] overflow-y-auto">
             {/* Related videos */}
             <div className="divide-y divide-white/10">
-              {relatedVideos.map((video, index) => (
+              {relatedVideos.map((video) => (
                 <div 
                   key={video.id}
                   className="p-4 hover:bg-white/5 cursor-pointer"
