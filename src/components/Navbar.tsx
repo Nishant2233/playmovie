@@ -36,38 +36,38 @@ const Navbar = () => {
     e.preventDefault();
     navigate(`/search/${searchText}`)
   }
-  // hide navbar on the welcome page
+
   if (location.pathname === "/") return null
   return (
    <header className={`sticky top-0 z-30 ${solid? 'bg-transparent' : 'bg-transparent'} transition-all duration-300 ${hidden? '-translate-y-full' : 'translate-y-0'}`}>
      <div className="px-4 md:px-10 h-20 flex items-center justify-between gap-4">
+      
+      <div className="flex md:hidden items-center justify- w-full ">
+        <div></div> 
+        <button onClick={()=> navigate('/home')} className="shrink-0">
+          <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer elevate" />
+        </button>
+
+      </div>
+     
       <div className="hidden md:flex items-center justify-center flex-1">
         <div className="px-3 py-2 rounded-[2rem] bg-[#0b0b0b]/70 border border-white/10 backdrop-blur flex items-center gap-1 w-full max-w-6xl">
           {/* Logo inside the unified navbar */}
           <button onClick={()=> navigate('/home')} className="shrink-0 mr-2">
             <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer elevate" />
           </button>
-
           {/* Primary links */}
-           {[
-             {to:'/home',label:'Home'},
-             {to:'/movies',label:'Movies'},
-             {to:'/tvshows',label:'TV Shows'},
-             {to:'/top-imdb',label:'Top IMDb'}
-           ].map(link => (
+          {[{to:'/home',label:'Home'},{to:'/movies',label:'Movies'},{to:'/tvshows',label:'TV Shows'},{to:'/top-imdb',label:'Top IMDb'}].map(link => (
             <NavLink key={link.to} to={link.to} className={({isActive})=>`relative px-4 py-2 rounded-xl transition-colors ${isActive? 'text-white' : 'text-white/80 hover:text-white'}`}>
                {({isActive}) => (
                  <span className="relative">{link.label}
-                  <span className={`absolute -bottom-1 left-0 right-0 h-[2px] rounded-full bg-purple-600 transition-opacity ${isActive? 'opacity-100' : 'opacity-0 group-hover:opacity-80'}`}></span>
+                  <span className={`absolute -bottom-1 left-0 right-0 h-[2px] rounded-full bg-purple-600 transition-opacity ${isActive? 'opacity-100' : 'opacity-0 group-hover:opacity-80 '}`}></span>
                  </span>
                )}
              </NavLink>
            ))}
            <div className="px-3 py-2"><Genres /></div>
-
-          {/* Spacer to push utilities to right inside same bar */}
           <div className="flex-1" />
-
           {/* Search inside unified navbar */}
           <form onSubmit={handleSubmit} className="hidden md:block">
             <div className="relative w-64">
@@ -76,7 +76,6 @@ const Navbar = () => {
                value={searchText} onChange={handleChange} />
             </div>
           </form>
-
           {/* Watchlist inside unified navbar */}
            <Link to="/watchlist" className="ml-2 px-4 py-2 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-sm font-semibold shrink-0">Watchlist</Link>
          </div>

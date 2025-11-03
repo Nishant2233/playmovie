@@ -14,6 +14,10 @@ const TopImdb = () => {
   const [filter, setFilter] = useState<'all' | 'movie' | 'tv'>('all')
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [pageMovie, pageTv, filter]);
+
+  useEffect(() => {
     apiClient.get('/movie/top_rated', { params: { page: pageMovie } }).then(r=> { setMovies(r.data.results); setTotalMoviePages(r.data.total_pages || 1) }).catch(()=>{})
   }, [pageMovie])
   useEffect(() => {
