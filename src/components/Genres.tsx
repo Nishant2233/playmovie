@@ -113,12 +113,18 @@ const Genres = () => {
   <DropdownMenuTrigger asChild>
     <h1 className="cursor-pointer hover:text-[var(--accent)] transition-colors">{!genres ? "Genres": genreName}</h1>
   </DropdownMenuTrigger>
-  <DropdownMenuContent align="start" sideOffset={12} className="w-[760px] max-w-[90vw] p-4 bg-[#0f0f10] text-white border border-white/10 rounded-xl shadow-2xl">
-    <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+  <DropdownMenuContent align="start" sideOffset={12} className="w-[760px] max-w-[90vw] p-4 bg-[#0a0f1d] text-white border border-sky-500/60 rounded-2xl shadow-[0_12px_50px_rgba(46,130,255,0.25)]">
+    <div className="relative overflow-hidden rounded-2xl bg-white/5 border border-sky-500/30 p-4">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(80,140,255,0.18)_0%,_transparent_55%)]" />
       <DropdownMenuRadioGroup value={(genres ?? '').toString()} onValueChange={onChange}>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-3 gap-x-8">
     {genreList.map((genre) => (
-            <DropdownMenuRadioItem key={genre.id} onClick={()=> setGenreName(genre.name)} value={String(genre.id)} className="cursor-pointer data-[state=checked]:text-purple-400 focus:bg-white/5 rounded px-2 py-1">
+            <DropdownMenuRadioItem
+              key={genre.id}
+              onClick={()=> setGenreName(genre.name)}
+              value={String(genre.id)}
+              className="cursor-pointer rounded-lg px-3 py-2 border border-transparent text-white/90 hover:text-white hover:border-sky-400/60 hover:bg-white/10 data-[state=checked]:border-sky-400 data-[state=checked]:bg-sky-500/15 data-[state=checked]:text-white transition-all duration-150"
+            >
               {genre.name}
             </DropdownMenuRadioItem>
           ))}

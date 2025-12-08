@@ -137,3 +137,33 @@
 .bg-panel { background: var(--panel); }
 .elevate { box-shadow: var(--card-shadow); }
 .rounded-card { border-radius: var(--radius); }
+
+/* Ensure embedded players cover the full viewport when entering fullscreen */
+iframe:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  border: 0;
+  display: block;
+}
+iframe:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  border: 0;
+  display: block;
+}
+
+/* Remove any default page padding when the document enters fullscreen */
+html:fullscreen, body:fullscreen {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+}
+html:-webkit-full-screen, body:-webkit-full-screen {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+}

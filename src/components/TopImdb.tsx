@@ -3,7 +3,6 @@ import apiClient from "../services/api-client"
 import MovieCard from "./MovieCard"
 import TvShowCard from "./TvShowCard"
 import Pagination from "./Pagination"
-
 const TopImdb = () => {
   const [movies, setMovies] = useState<any[]>()
   const [tv, setTv] = useState<any[]>()
@@ -32,12 +31,17 @@ const TopImdb = () => {
 
   return (
     <div className="px-5 md:px-10 mb-10">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl md:text-3xl font-bold">Top IMDb</h2>
-        <div className="flex items-center gap-2 text-sm">
-          <button onClick={()=> setFilter('all')} className={`px-3 py-1.5 rounded-full ${filter==='all'?'bg-white/10 border border-white/20':'bg-white/5'}`}>All</button>
-          <button onClick={()=> setFilter('movie')} className={`px-3 py-1.5 rounded-full ${filter==='movie'?'bg-white/10 border border-white/20':'bg-white/5'}`}>Movies</button>
-          <button onClick={()=> setFilter('tv')} className={`px-3 py-1.5 rounded-full ${filter==='tv'?'bg-white/10 border border-white/20':'bg-white/5'}`}>TV Shows</button>
+      <div className="relative -mx-5 md:-mx-10 px-5 md:px-10 pt-8 pb-6 mb-6 overflow-hidden">
+        <div className="absolute inset-0 bg-[#0a0f1d]/80 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(147,51,234,0.12)_0%,_transparent_60%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,_transparent_0%,_rgba(0,0,0,0.3)_100%)]" />
+        <div className="relative flex items-center justify-between">
+          <h2 className="text-2xl md:text-3xl font-bold">Top IMDb</h2>
+          <div className="flex items-center gap-2 text-sm">
+            <button onClick={()=> setFilter('all')} className={`px-3 py-1.5 rounded-full ${filter==='all'?'bg-white/10 border border-white/20':'bg-white/5'}`}>All</button>
+            <button onClick={()=> setFilter('movie')} className={`px-3 py-1.5 rounded-full ${filter==='movie'?'bg-white/10 border border-white/20':'bg-white/5'}`}>Movies</button>
+            <button onClick={()=> setFilter('tv')} className={`px-3 py-1.5 rounded-full ${filter==='tv'?'bg-white/10 border border-white/20':'bg-white/5'}`}>TV Shows</button>
+          </div>
         </div>
       </div>
 
