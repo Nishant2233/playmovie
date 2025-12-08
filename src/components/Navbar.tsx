@@ -57,7 +57,7 @@ const Navbar = () => {
             <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer elevate" />
           </button>
           {/* Primary links */}
-          {[{to:'/home',label:'Home'},{to:'/movies',label:'Movies'},{to:'/tvshows',label:'TV Shows'},{to:'/top-imdb',label:'Top IMDb'}].map(link => (
+          {[{to:'/home',label:'Home'},{to:'/movies',label:'Movies'},{to:'/tvshows',label:'TV Shows'},{to:'/top-imdb',label:'Top IMDb'},{to:'/anime',label:'Anime'}].map(link => (
             <NavLink key={link.to} to={link.to} className={({isActive})=>`relative px-4 py-2 rounded-xl transition-colors ${isActive? 'text-white' : 'text-white/80 hover:text-white'}`}>
                {({isActive}) => (
                  <span className="relative">{link.label}
@@ -97,6 +97,7 @@ const Navbar = () => {
            <Link to="/movies" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Movies</Link>
            <Link to="/tvshows" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">TV Shows</Link>
            <Link to="/top-imdb" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Top IMDb</Link>
+           <Link to="/anime" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Anime</Link>
            <Genres />
            <Link to="/watchlist" onClick={()=> setOpen(false)} className="px-4 py-2 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-center font-semibold">Watchlist</Link>
          </div>

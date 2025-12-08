@@ -10,6 +10,7 @@ const Tranding = () => {
   const trendingTv = useTrandingList('tv').trandingData
   const recommended = useDiscover('movie').items
   const [topMixed, setTopMixed] = useState<any[]>([])
+  const [animeList, setAnimeList] = useState<any[]>([])
 
   useEffect(() => {
     Promise.all([
@@ -20,12 +21,23 @@ const Tranding = () => {
       setTopMixed(mixed)
     }).catch(()=>{})
   }, [])
+  useEffect(() => {
+    apiClient.get('/discover/tv', {
+      params: {
+        page: 1,
+        with_genres: 16,
+        with_origin_country: 'JP',
+        sort_by: 'popularity.desc'
+      }
+    }).then(r => setAnimeList((r.data.results || []).slice(0,6))).catch(()=>{})
+  }, [])
   return (
     <div>
       <HeroCarousel />
       <GridSection title="Trending Movies" items={trendingMovies} kind='movie' />
       <GridSection title="Trending TV Shows" items={trendingTv} kind='tv' />
       <GridSection title="Top IMDb" items={topMixed} kind='mixed' />
+      <GridSection title="Anime Highlights" items={animeList} kind='tv' />
       <GridSection title="Recommended" items={recommended} kind='movie' />
     </div>
   )

@@ -9,6 +9,7 @@ import Watchlist from "../components/Watchlist";
 import TopImdb from "../components/TopImdb";
 import DetailsPage from "../pages/DetailsPage";
 import Welcome from "../pages/Welcome";
+import AnimeList from "../components/AnimeList";
 
 const AllRoutes = () => {
   return(
@@ -17,6 +18,7 @@ const AllRoutes = () => {
   <Route path="/home" element={<Tranding/>}/>
   <Route path ="/movies" element = {<MOvieList/>}/>
   <Route path ="/tvshows" element ={<TvShowList/>}/>
+  <Route path ="/anime" element ={<AnimeList/>}/>
   <Route path ="/search/:searchName/" element={<SearchList/>}/>
   <Route path ="/player/:playerId" element={<Player/>}/>
   <Route path ="/tv/:tvId" element={<TvPlayer/>}/>

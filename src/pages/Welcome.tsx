@@ -50,7 +50,7 @@ const Welcome = () => {
         `}</style>
 
   {/* collage grid: responsive - 3 cols on mobile, 6 on md+; fills viewport on mobile */}
-  <div className="grid grid-cols-3 md:grid-cols-6 gap-3 p-2 md:gap-6 md:p-6 h-full min-h-screen items-center justify-items-center pointer-events-none relative" style={{ zIndex: 0 }}>
+  <div className="grid grid-cols-3 md:grid-cols-6 gap-[3px] p-2 md:gap-[12px] md:p-6 h-full min-h-screen items-center justify-items-center pointer-events-none relative" style={{ zIndex: 0 }}>
           {Array.from({ length: 24 }).map((_, i) => {
             const m = cards[i]
             const col = i % 6
