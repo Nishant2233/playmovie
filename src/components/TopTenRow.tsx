@@ -4,7 +4,7 @@ const TopTenRow = ({ items }: { items?: any[] }) => {
   return (
     <div id="top10" className="px-5 md:px-10 mb-8">
       <div className="flex items-center gap-2 mb-4">
-        <span className="w-1 h-6 bg-[var(--accent)]" />
+        <span className="w-1 h-6 bg-purple-600" />
         <h2 className="text-2xl md:text-3xl font-bold">Top 10</h2>
       </div>
       <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">

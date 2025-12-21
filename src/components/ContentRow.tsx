@@ -8,7 +8,7 @@ const ContentRow = ({ title, items }: { title: string; items?: any[] }) => {
     <div className="px-5 md:px-10 mb-8">
       <div className="flex items-end justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="w-1 h-6 bg-[var(--accent)]" />
+          <span className="w-1 h-6 bg-purple-600" />
           <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
         </div>
         <div className="hidden md:flex gap-2">

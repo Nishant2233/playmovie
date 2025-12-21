@@ -16,7 +16,7 @@ const GridSection = ({ title, items, kind = 'movie' }: Props) => {
   return (
     <div className="px-5 md:px-10 mb-10">
       <div className="flex items-center gap-2 mb-4">
-        <span className="w-1 h-6 bg-[var(--accent)]" />
+        <span className="w-1 h-6 bg-purple-600" />
         <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
