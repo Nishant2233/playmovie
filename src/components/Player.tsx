@@ -11,7 +11,7 @@ const Player = () => {
         : `https://multiembed.mov/?video_id=${playerId}&tmdb=1`;
 
     return (
-      <div className="relative flex flex-col items-center w-full min-h-screen bg-gradient-to-b from-[#050505] via-[#0b0b0b] to-black text-white pb-10">
+      <div className="relative flex flex-col items-center w-full min-h-screen bg-gradient-to-b from-[#050505] via-[#0b0b0b] to-black text-white pb-10 overflow-y-auto md:overflow-hidden">
         <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(128,90,213,0.15)_0,_rgba(0,0,0,0)_45%)]" />
         <header className="w-full max-w-6xl flex items-center justify-between px-4 md:px-6 pt-6 relative z-20">
           <button
@@ -28,17 +28,26 @@ const Player = () => {
         </header>
 
         <div className="w-full max-w-6xl px-4 md:px-6 mt-6 relative z-10">
+          <style>{`
+            /* Player wrapper: on small screens occupy viewport height minus header so controls are visible */
+            .player-wrapper { height: calc(100vh - 120px); max-height: calc(100vh - 120px); }
+            /* On md+ keep original aspect ratio and allow natural height */
+            @media (min-width: 768px) {
+              .player-wrapper { height: auto; max-height: none; aspect-ratio: 16/9; }
+            }
+          `}</style>
+
           <div
-            className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-black"
+            className="relative w-full player-wrapper rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-black"
           >
             <iframe
               className="absolute top-0 left-0 w-full h-full"
-              allow='autoplay; encrypted-media; gyroscope; picture-in-picture'
+              allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               src={movieUrl}
               title="Movie Player"
               frameBorder="0"
-              style={{ minHeight: '320px', background: 'black' }}
+              style={{ background: 'black', width: '100%', height: '100%' }}
             />
           </div>
 
