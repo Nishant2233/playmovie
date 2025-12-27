@@ -10,6 +10,7 @@ import TopImdb from "../components/TopImdb";
 import DetailsPage from "../pages/DetailsPage";
 import Welcome from "../pages/Welcome";
 import AnimeList from "../components/AnimeList";
+import FilteredResults from "../components/FilteredResults";
 
 const AllRoutes = () => {
   return(
@@ -20,6 +21,7 @@ const AllRoutes = () => {
   <Route path ="/tvshows" element ={<TvShowList/>}/>
   <Route path ="/anime" element ={<AnimeList/>}/>
   <Route path ="/search/:searchName/" element={<SearchList/>}/>
+  <Route path ="/filtered-results" element={<FilteredResults/>}/>
   <Route path ="/player/:playerId" element={<Player/>}/>
   <Route path ="/tv/:tvId" element={<TvPlayer/>}/>
   <Route path ="/watchlist" element={<Watchlist/>}/>
