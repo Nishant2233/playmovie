@@ -4,6 +4,40 @@ import { useSharedWatchlist } from "../contex/sharedWatchlist.context"
 import MovieCard from "./MovieCard"
 import { Share2, Copy, Check, X, Plus, Trash2 } from "lucide-react"
 
+// Helper functions for URL-safe encoding/decoding
+const encodeWatchlist = (data: any): string => {
+  try {
+    const jsonString = JSON.stringify(data)
+    // Convert to base64
+    const base64 = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+      return String.fromCharCode(parseInt(p1, 16))
+    }))
+    // URL-encode the base64 string
+    return encodeURIComponent(base64)
+  } catch (error) {
+    console.error("Encoding error:", error)
+    throw error
+  }
+}
+
+const decodeWatchlist = (encoded: string): any => {
+  try {
+    // URL-decode first
+    const base64 = decodeURIComponent(encoded)
+    // Decode base64
+    const jsonString = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    )
+    return JSON.parse(jsonString)
+  } catch (error) {
+    console.error("Decoding error:", error)
+    throw error
+  }
+}
+
 const Watchlist = () => {
   const { items, remove, add } = useWatchlist()
   const { sharedWatchlists, shareWatchlist, addSharedWatchlist, removeSharedWatchlist } = useSharedWatchlist()
@@ -21,12 +55,17 @@ const Watchlist = () => {
     }
     const name = prompt("Enter your name:") || "Anonymous"
     const id = shareWatchlist(items, name)
-    // Encode watchlist data in the URL
-    const encodedData = btoa(JSON.stringify({ id, senderName: name, items }))
-    const link = `${window.location.origin}/watchlist?share=${encodedData}`
-    setShareId(id)
-    setShareLink(link)
-    setShowShareModal(true)
+    // Encode watchlist data in the URL using URL-safe encoding
+    try {
+      const encodedData = encodeWatchlist({ id, senderName: name, items })
+      const link = `${window.location.origin}/watchlist?share=${encodedData}`
+      setShareId(id)
+      setShareLink(link)
+      setShowShareModal(true)
+    } catch (error) {
+      console.error("Error encoding watchlist:", error)
+      alert("Error generating share link. Please try again.")
+    }
   }
 
   const copyToClipboard = (text: string, id: string) => {
@@ -52,11 +91,32 @@ const Watchlist = () => {
         encodedData = parts[parts.length - 1]
       }
 
-      // Try to decode the data
-      let watchlistData: { id: string; senderName: string; items: any[] }
+      // Decode URL-encoded data first
       try {
-        watchlistData = JSON.parse(atob(encodedData))
-      } catch (e) {
+        const watchlistData = decodeWatchlist(encodedData)
+        
+        // Validate the data
+        if (!watchlistData.id || !watchlistData.items || !Array.isArray(watchlistData.items)) {
+          throw new Error("Invalid watchlist data")
+        }
+
+        // Check if already exists
+        if (sharedWatchlists.some(w => w.id === watchlistData.id)) {
+          alert("This watchlist is already added!")
+          return
+        }
+
+        // Add the shared watchlist
+        addSharedWatchlist(
+          watchlistData.id,
+          watchlistData.senderName || senderName || "Anonymous",
+          watchlistData.items
+        )
+
+        alert(`Successfully added ${watchlistData.senderName || senderName || "Anonymous"}'s watchlist!`)
+        setInputId("")
+        setSenderName("")
+      } catch (decodeError) {
         // If decoding fails, it might be just an ID (old format)
         // In that case, we need the sender name
         if (!senderName.trim()) {
@@ -66,36 +126,35 @@ const Watchlist = () => {
         // Check if we can find it in our own shared watchlists (if we shared it)
         const existing = sharedWatchlists.find(w => w.id === encodedData)
         if (existing) {
-          watchlistData = {
+          const watchlistData = {
             id: existing.id,
             senderName: senderName || existing.senderName,
             items: existing.items
           }
+          
+          // Check if already exists
+          if (sharedWatchlists.some(w => w.id === watchlistData.id)) {
+            alert("This watchlist is already added!")
+            return
+          }
+
+          addSharedWatchlist(
+            watchlistData.id,
+            watchlistData.senderName,
+            watchlistData.items
+          )
+
+          alert(`Successfully added ${watchlistData.senderName}'s watchlist!`)
+          setInputId("")
+          setSenderName("")
         } else {
           alert("Invalid share link or ID. Please use the full share link provided by the sender.")
-          return
+          console.error("Decode error:", decodeError)
         }
       }
-
-      // Check if already exists
-      if (sharedWatchlists.some(w => w.id === watchlistData.id)) {
-        alert("This watchlist is already added!")
-        return
-      }
-
-      // Add the shared watchlist
-      addSharedWatchlist(
-        watchlistData.id,
-        watchlistData.senderName || senderName || "Anonymous",
-        watchlistData.items
-      )
-
-      alert(`Successfully added ${watchlistData.senderName}'s watchlist!`)
-      setInputId("")
-      setSenderName("")
     } catch (error) {
       alert("Error adding watchlist. Please check the link or ID and try again.")
-      console.error(error)
+      console.error("Error:", error)
     }
   }
 
@@ -114,8 +173,9 @@ const Watchlist = () => {
       setInputId(shareParam)
       // Try to auto-add if we can decode it
       try {
-        const watchlistData = JSON.parse(atob(shareParam))
-        if (watchlistData.items && watchlistData.senderName) {
+        const watchlistData = decodeWatchlist(shareParam)
+        
+        if (watchlistData.items && Array.isArray(watchlistData.items) && watchlistData.senderName) {
           // Check if already exists
           const exists = sharedWatchlists.some(w => w.id === watchlistData.id)
           if (!exists) {
@@ -130,6 +190,7 @@ const Watchlist = () => {
         }
       } catch (e) {
         // Not a valid encoded link, just set the input
+        console.log("Could not auto-decode share link, user can manually add it")
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
