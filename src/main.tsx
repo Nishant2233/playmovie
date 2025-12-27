@@ -8,6 +8,7 @@ import { GenresProvider } from './contex/genres.contex.tsx'
 import { SearchResultProvider } from './contex/searchResult.context.tsx'
 import { WatchlistProvider } from './contex/watchlist.context.tsx'
 import { DetailsProvider } from './contex/details.context.tsx'
+import { WatchProgressProvider } from './contex/watchProgress.context.tsx'
  
 
 
@@ -18,9 +19,11 @@ createRoot(document.getElementById('root')!).render(
     <SearchResultProvider>
     <GenresProvider>
     <WatchlistProvider>
+    <WatchProgressProvider>
     <DetailsProvider>
       <App />
     </DetailsProvider>
+    </WatchProgressProvider>
     </WatchlistProvider>
     </GenresProvider>
     </SearchResultProvider>

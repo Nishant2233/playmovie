@@ -2,6 +2,7 @@ import HeroCarousel from '../HeroCarousel'
 import useTrandingList from '../../hooks/useTrandingList'
 import useDiscover from '../../hooks/useDiscover'
 import GridSection from '../GridSection'
+import ContinueWatching from '../ContinueWatching'
 import { useEffect, useState } from 'react'
 import apiClient from '../../services/api-client'
 
@@ -34,6 +35,7 @@ const Tranding = () => {
   return (
     <div>
       <HeroCarousel />
+      <ContinueWatching />
       <GridSection title="Trending Movies" items={trendingMovies} kind='movie' />
       <GridSection title="Trending TV Shows" items={trendingTv} kind='tv' />
       <GridSection title="Top IMDb" items={topMixed} kind='mixed' />

@@ -1,14 +1,50 @@
 
 import { useNavigate, useParams } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useWatchProgress } from '../contex/watchProgress.context'
+import apiClient from '../services/api-client'
 
 const Player = () => {
     const {playerId}=useParams();
     const navigate = useNavigate();
     const [server, setServer] = useState(1);
+    const { updateProgress, getProgress } = useWatchProgress()
+    const [movieData, setMovieData] = useState<any>(null)
+    
     const movieUrl = server === 1
         ? `https://vidsrc-embed.ru/embed/movie/${playerId}`
         : `https://multiembed.mov/?video_id=${playerId}&tmdb=1`;
+
+    useEffect(() => {
+        if (!playerId) return
+        apiClient.get(`/movie/${playerId}`).then(r => setMovieData(r.data)).catch(()=>{})
+    }, [playerId])
+
+    // Simulate progress tracking (since we can't access iframe video events)
+    useEffect(() => {
+        if (!playerId || !movieData) return
+        
+        // Check if there's existing progress
+        const existing = getProgress(Number(playerId), 'movie')
+        let currentProgress = existing?.progress || 0
+        
+        // Simulate progress increase every 10 seconds (in real app, this would come from video player events)
+        const interval = setInterval(() => {
+            if (currentProgress < 95) {
+                currentProgress += 2 // Increase by 2% every 10 seconds
+                updateProgress({
+                    id: Number(playerId),
+                    type: 'movie',
+                    title: movieData.title,
+                    poster_path: movieData.poster_path || '',
+                    backdrop_path: movieData.backdrop_path || '',
+                    progress: currentProgress
+                })
+            }
+        }, 10000) // Update every 10 seconds
+
+        return () => clearInterval(interval)
+    }, [playerId, movieData, updateProgress, getProgress])
 
     return (
       <div className="relative flex flex-col items-center w-full min-h-screen bg-gradient-to-b from-[#050505] via-[#0b0b0b] to-black text-white pb-10 overflow-y-auto md:overflow-hidden">

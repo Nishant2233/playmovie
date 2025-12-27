@@ -1,38 +1,71 @@
 import { useEffect, useMemo, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import apiClient from "../services/api-client"
+import { useWatchProgress } from "../contex/watchProgress.context"
 
 type Season = { season_number: number; episode_count: number; name: string }
 type Episode = { episode_number: number; name: string }
 
 const TvPlayer = () => {
   const { tvId } = useParams()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const [seasons, setSeasons] = useState<Season[]>([])
   const [seasonNumber, setSeasonNumber] = useState<number>(1)
   const [episodes, setEpisodes] = useState<Episode[]>([])
   const [episodeNumber, setEpisodeNumber] = useState<number>(1)
   const [server, setServer] = useState(1);
+  const { updateProgress, getProgress } = useWatchProgress()
+  const [tvData, setTvData] = useState<any>(null)
 
   useEffect(() => {
     if (!tvId) return
     apiClient.get(`/tv/${tvId}`).then(r => {
+      setTvData(r.data)
       const list: Season[] = (r.data?.seasons || []).filter((s: Season) => s.season_number > 0)
       setSeasons(list)
+      
+      // Check URL params for season/episode
+      const urlSeason = searchParams.get('season')
+      const urlEpisode = searchParams.get('episode')
+      
       if (list.length > 0) {
-        setSeasonNumber(list[0].season_number)
+        if (urlSeason) {
+          const seasonNum = Number(urlSeason)
+          if (list.find(s => s.season_number === seasonNum)) {
+            setSeasonNumber(seasonNum)
+          } else {
+            setSeasonNumber(list[0].season_number)
+          }
+        } else {
+          setSeasonNumber(list[0].season_number)
+        }
       }
     }).catch(() => {})
-  }, [tvId])
+  }, [tvId, searchParams])
 
   useEffect(() => {
     if (!tvId || !seasonNumber) return
     apiClient.get(`/tv/${tvId}/season/${seasonNumber}`).then(r => {
       const eps: Episode[] = r.data?.episodes || []
       setEpisodes(eps)
-      if (eps.length > 0) setEpisodeNumber(eps[0].episode_number)
+      
+      // Check URL params for episode
+      const urlEpisode = searchParams.get('episode')
+      if (eps.length > 0) {
+        if (urlEpisode) {
+          const epNum = Number(urlEpisode)
+          if (eps.find(e => e.episode_number === epNum)) {
+            setEpisodeNumber(epNum)
+          } else {
+            setEpisodeNumber(eps[0].episode_number)
+          }
+        } else {
+          setEpisodeNumber(eps[0].episode_number)
+        }
+      }
     }).catch(() => {})
-  }, [tvId, seasonNumber])
+  }, [tvId, seasonNumber, searchParams])
 
   const movieUrl = useMemo(() => {
     if (!tvId || !seasonNumber || !episodeNumber) return ""
@@ -40,6 +73,34 @@ const TvPlayer = () => {
       ? `https://vidsrc-embed.ru/embed/tv?tmdb=${tvId}&season=${seasonNumber}&episode=${episodeNumber}&autoplay=1`
       : `https://multiembed.mov/?video_id=${tvId}&tmdb=1&season=${seasonNumber}&episode=${episodeNumber}`;
   }, [tvId, seasonNumber, episodeNumber, server])
+
+  // Track progress for TV shows
+  useEffect(() => {
+    if (!tvId || !tvData || !seasonNumber || !episodeNumber) return
+    
+    // Check if there's existing progress
+    const existing = getProgress(Number(tvId), 'tv')
+    let currentProgress = existing?.progress || 0
+    
+    // Simulate progress increase every 10 seconds
+    const interval = setInterval(() => {
+      if (currentProgress < 95) {
+        currentProgress += 2
+        updateProgress({
+          id: Number(tvId),
+          type: 'tv',
+          name: tvData.name,
+          poster_path: tvData.poster_path || '',
+          backdrop_path: tvData.backdrop_path || '',
+          progress: currentProgress,
+          season: seasonNumber,
+          episode: episodeNumber
+        })
+      }
+    }, 10000)
+
+    return () => clearInterval(interval)
+  }, [tvId, tvData, seasonNumber, episodeNumber, updateProgress, getProgress])
 
   return (
     <div className="relative w-full min-h-screen bg-gradient-to-b from-[#050505] via-[#0b0b0b] to-black text-white flex flex-col items-center pb-10">
