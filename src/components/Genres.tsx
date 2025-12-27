@@ -43,7 +43,7 @@ const sortOptions = [
 ]
 
 const Genres = () => {
-  const { genres, setGenres } = useContext(GenresContext)
+  const { setGenres } = useContext(GenresContext)
   const { type, setType, sortBy, setSortBy, year, setYear, setGenre: setFilterGenre, resetFilters } = useFilters()
   const navigate = useNavigate()
   const [selectedGenreId, setSelectedGenreId] = useState<number | null>(null)
