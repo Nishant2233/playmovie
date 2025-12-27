@@ -25,9 +25,8 @@ const TvPlayer = () => {
       const list: Season[] = (r.data?.seasons || []).filter((s: Season) => s.season_number > 0)
       setSeasons(list)
       
-      // Check URL params for season/episode
+      // Check URL params for season
       const urlSeason = searchParams.get('season')
-      const urlEpisode = searchParams.get('episode')
       
       if (list.length > 0) {
         if (urlSeason) {

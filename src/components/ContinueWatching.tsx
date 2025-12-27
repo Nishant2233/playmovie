@@ -1,10 +1,10 @@
 import { useRef, useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useWatchProgress } from "../contex/watchProgress.context"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, X } from "lucide-react"
 
 const ContinueWatching = () => {
-  const { items } = useWatchProgress()
+  const { items, remove } = useWatchProgress()
   const navigate = useNavigate()
   const scrollRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
@@ -14,11 +14,14 @@ const ContinueWatching = () => {
     const checkScroll = () => {
       if (!scrollRef.current) return
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
-      setCanScrollLeft(scrollLeft > 0)
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
+      const hasMoreContent = scrollWidth > clientWidth
+      setCanScrollLeft(scrollLeft > 10)
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10 && hasMoreContent)
     }
 
-    checkScroll()
+    // Initial check
+    setTimeout(checkScroll, 100)
+    
     const scrollElement = scrollRef.current
     scrollElement?.addEventListener('scroll', checkScroll)
     window.addEventListener('resize', checkScroll)
@@ -31,11 +34,20 @@ const ContinueWatching = () => {
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return
-    const scrollAmount = scrollRef.current.clientWidth * 0.8
+    const cardWidth = 320 // width of each card + gap
+    const scrollAmount = cardWidth * 2 // scroll 2 cards at a time
     scrollRef.current.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth'
     })
+    
+    // Update arrow visibility after scroll
+    setTimeout(() => {
+      if (!scrollRef.current) return
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
+      setCanScrollLeft(scrollLeft > 10)
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
+    }, 100)
   }
 
   if (items.length === 0) return null
@@ -49,21 +61,27 @@ const ContinueWatching = () => {
       
       <div className="relative">
         {/* Left Arrow */}
-        {canScrollLeft && (
-          <button
-            onClick={() => scroll('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white transition-all"
-            aria-label="Scroll left"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-        )}
+        <button
+          onClick={() => scroll('left')}
+          className={`absolute left-0 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-black/80 hover:bg-black backdrop-blur-md border border-white/30 flex items-center justify-center text-white transition-all shadow-lg ${
+            canScrollLeft ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          aria-label="Scroll left"
+        >
+          <ChevronLeft className="w-7 h-7" />
+        </button>
 
         {/* Scrollable Container */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2 pl-0 pr-0"
+          style={{ 
+            scrollbarWidth: 'none', 
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch',
+            paddingLeft: canScrollLeft ? '0' : '0',
+            paddingRight: canScrollRight ? '0' : '0'
+          }}
         >
           {items.map((item) => {
             const progressPercent = Math.min(100, Math.max(0, item.progress))
@@ -71,6 +89,11 @@ const ContinueWatching = () => {
             const playUrl = isTV 
               ? `/tv/${item.id}${item.season && item.episode ? `?season=${item.season}&episode=${item.episode}` : ''}`
               : `/player/${item.id}`
+
+            const handleRemove = (e: React.MouseEvent) => {
+              e.stopPropagation()
+              remove(item.id, item.type)
+            }
 
             return (
               <div
@@ -97,12 +120,21 @@ const ContinueWatching = () => {
                     />
                   </div>
 
-                  {/* Overlay on hover */}
+                  {/* Overlay on hover - only shows on this specific card */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white text-2xl">
                       ▶
                     </div>
                   </div>
+
+                  {/* Remove button */}
+                  <button
+                    onClick={handleRemove}
+                    className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/80 hover:bg-red-600/80 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white transition-all opacity-0 group-hover:opacity-100"
+                    aria-label="Remove from continue watching"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
 
                   {/* Type badge */}
                   <div className="absolute top-3 left-3 px-2 py-1 rounded bg-black/70 backdrop-blur text-xs font-semibold text-white">
@@ -110,7 +142,7 @@ const ContinueWatching = () => {
                   </div>
 
                   {/* Progress percentage */}
-                  <div className="absolute top-3 right-3 px-2 py-1 rounded bg-black/70 backdrop-blur text-xs font-semibold text-white">
+                  <div className="absolute top-12 right-3 px-2 py-1 rounded bg-black/70 backdrop-blur text-xs font-semibold text-white">
                     {Math.round(progressPercent)}%
                   </div>
                 </div>
@@ -132,15 +164,15 @@ const ContinueWatching = () => {
         </div>
 
         {/* Right Arrow */}
-        {canScrollRight && (
-          <button
-            onClick={() => scroll('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white transition-all"
-            aria-label="Scroll right"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-        )}
+        <button
+          onClick={() => scroll('right')}
+          className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-black/80 hover:bg-black backdrop-blur-md border border-white/30 flex items-center justify-center text-white transition-all shadow-lg ${
+            canScrollRight ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          aria-label="Scroll right"
+        >
+          <ChevronRight className="w-7 h-7" />
+        </button>
       </div>
 
       <style>{`
