@@ -15,8 +15,8 @@ const encodeWatchlist = (data: any): string => {
       // Modern approach using TextEncoder (available in all modern browsers)
       const encoder = new TextEncoder()
       const bytes = encoder.encode(jsonString)
-      // Convert Uint8Array to string for btoa
-      const binaryString = String.fromCharCode.apply(null, Array.from(bytes))
+      // Convert Uint8Array to string for btoa (safer method for large arrays)
+      const binaryString = Array.from(bytes, byte => String.fromCharCode(byte)).join('')
       base64 = btoa(binaryString)
     } catch {
       // Fallback: encode URI component first, then convert to base64
