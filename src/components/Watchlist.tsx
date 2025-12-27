@@ -5,14 +5,25 @@ import MovieCard from "./MovieCard"
 import { Share2, Copy, Check, X, Plus, Trash2 } from "lucide-react"
 
 // Helper functions for URL-safe encoding/decoding
+// Using a reliable method that works in all environments including production
 const encodeWatchlist = (data: any): string => {
   try {
     const jsonString = JSON.stringify(data)
-    // Convert to base64
-    const base64 = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, (match, p1) => {
-      return String.fromCharCode(parseInt(p1, 16))
-    }))
-    // URL-encode the base64 string
+    // Convert string to base64 using UTF-8 safe method
+    let base64: string
+    try {
+      // Modern approach using TextEncoder (available in all modern browsers)
+      const encoder = new TextEncoder()
+      const bytes = encoder.encode(jsonString)
+      // Convert Uint8Array to string for btoa
+      const binaryString = String.fromCharCode.apply(null, Array.from(bytes))
+      base64 = btoa(binaryString)
+    } catch {
+      // Fallback: encode URI component first, then convert to base64
+      const uriEncoded = encodeURIComponent(jsonString)
+      base64 = btoa(uriEncoded)
+    }
+    // URL-encode the base64 string to make it URL-safe
     return encodeURIComponent(base64)
   } catch (error) {
     console.error("Encoding error:", error)
@@ -22,15 +33,24 @@ const encodeWatchlist = (data: any): string => {
 
 const decodeWatchlist = (encoded: string): any => {
   try {
-    // URL-decode first
+    // URL-decode first to get the base64 string
     const base64 = decodeURIComponent(encoded)
     // Decode base64
-    const jsonString = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    )
+    let jsonString: string
+    try {
+      // Modern approach using TextDecoder
+      const binaryString = atob(base64)
+      const bytes = new Uint8Array(binaryString.length)
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i)
+      }
+      const decoder = new TextDecoder('utf-8')
+      jsonString = decoder.decode(bytes)
+    } catch {
+      // Fallback: decode base64, then decode URI component
+      const decoded = atob(base64)
+      jsonString = decodeURIComponent(decoded)
+    }
     return JSON.parse(jsonString)
   } catch (error) {
     console.error("Decoding error:", error)
