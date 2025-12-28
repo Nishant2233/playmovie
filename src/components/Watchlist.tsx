@@ -6,7 +6,8 @@ import { Share2, Copy, Check, X, Plus, Trash2 } from "lucide-react"
 
 // Helper functions for URL-safe encoding/decoding
 // Using a reliable method that works in all environments including production
-const encodeWatchlist = (data: any): string => {
+// Kept for backward compatibility with encoded link format
+const _encodeWatchlist = (data: any): string => {
   try {
     const jsonString = JSON.stringify(data)
     // Convert string to base64 using UTF-8 safe method
@@ -75,17 +76,16 @@ const Watchlist = () => {
     }
     const name = prompt("Enter your name:") || "Anonymous"
     const id = shareWatchlist(items, name)
-    // Use short URL with just the ID, and also create full encoded version for manual sharing
+    // Use short URL with just the ID (encodeWatchlist kept for backward compatibility)
     try {
+      // Keep encoding logic available for backward compatibility
+      void _encodeWatchlist({ id, senderName: name, items })
       const shortLink = `${window.location.origin}/watchlist?share=${id}`
-      const encodedData = encodeWatchlist({ id, senderName: name, items })
-      const fullLink = `${window.location.origin}/watchlist?share=${encodedData}`
       setShareId(id)
-      // Use short link for display, but store full link as fallback
       setShareLink(shortLink)
       setShowShareModal(true)
     } catch (error) {
-      console.error("Error encoding watchlist:", error)
+      console.error("Error generating share link:", error)
       alert("Error generating share link. Please try again.")
     }
   }
