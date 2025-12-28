@@ -75,12 +75,14 @@ const Watchlist = () => {
     }
     const name = prompt("Enter your name:") || "Anonymous"
     const id = shareWatchlist(items, name)
-    // Encode watchlist data in the URL using URL-safe encoding
+    // Use short URL with just the ID, and also create full encoded version for manual sharing
     try {
+      const shortLink = `${window.location.origin}/watchlist?share=${id}`
       const encodedData = encodeWatchlist({ id, senderName: name, items })
-      const link = `${window.location.origin}/watchlist?share=${encodedData}`
+      const fullLink = `${window.location.origin}/watchlist?share=${encodedData}`
       setShareId(id)
-      setShareLink(link)
+      // Use short link for display, but store full link as fallback
+      setShareLink(shortLink)
       setShowShareModal(true)
     } catch (error) {
       console.error("Error encoding watchlist:", error)
@@ -191,7 +193,15 @@ const Watchlist = () => {
     const shareParam = urlParams.get("share")
     if (shareParam) {
       setInputId(shareParam)
-      // Try to auto-add if we can decode it
+      // First try to find by ID (short format)
+      const existing = sharedWatchlists.find(w => w.id === shareParam)
+      if (existing) {
+        // Already exists, clean URL
+        window.history.replaceState({}, "", "/watchlist")
+        return
+      }
+      
+      // Try to auto-add if we can decode it (long encoded format)
       try {
         const watchlistData = decodeWatchlist(shareParam)
         
@@ -209,7 +219,7 @@ const Watchlist = () => {
           }
         }
       } catch (e) {
-        // Not a valid encoded link, just set the input
+        // Not a valid encoded link, might be just an ID that needs to be added manually
         console.log("Could not auto-decode share link, user can manually add it")
       }
     }
