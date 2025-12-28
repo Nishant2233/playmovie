@@ -4,6 +4,7 @@ import AllRoutes from "./routes/AllRoutes"
 import DetailsModal from "./components/DetailsModal"
 import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
+import { Analytics } from "@vercel/analytics/react"
  
 
 
@@ -25,6 +26,7 @@ function App() {
         <AllRoutes />
       </div>
       <DetailsModal />
+      <Analytics />
     </>
   )
 }
