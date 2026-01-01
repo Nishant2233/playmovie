@@ -329,7 +329,7 @@ const Watchlist = () => {
           </div>
           <div>
             <label className="text-sm text-white/70 mb-2 block">Watchlist ID or Link:</label>
-            <div className="flex gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <input
                 type="text"
                 value={inputId}
@@ -339,7 +339,7 @@ const Watchlist = () => {
               />
               <button
                 onClick={handleAddSharedWatchlist}
-                className="px-4 py-2 rounded-lg bg-purple-600/90 hover:bg-purple-600 text-white font-medium flex items-center gap-2"
+                className="px-4 py-2 rounded-lg bg-purple-600/90 hover:bg-purple-600 text-white font-medium flex items-center justify-center gap-2 md:w-auto w-full"
               >
                 <Plus className="w-4 h-4" />
                 Add
