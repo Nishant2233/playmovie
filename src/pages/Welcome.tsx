@@ -1,10 +1,12 @@
 import useMovieList from "../hooks/UseMovies"
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
+import { usePageTransition } from "../contex/pageTransition.context"
 
 const Welcome = () => {
   const { movieLists } = useMovieList(undefined, 1)
   const navigate = useNavigate()
+  const { startTransition, isTransitioning } = usePageTransition()
 
   // typewriter state for the PlayMovie word (run once on mount)
   const fullWord = 'PlayMovie'
@@ -50,7 +52,17 @@ const Welcome = () => {
         `}</style>
 
   {/* collage grid: responsive - 3 cols on mobile, 6 on md+; fills viewport on mobile */}
-  <div className="grid grid-cols-3 md:grid-cols-6 gap-[3px] p-2 md:gap-[12px] md:p-6 h-full min-h-screen items-center justify-items-center pointer-events-none relative" style={{ zIndex: 0 }}>
+  <div 
+    id="welcome-cards-container"
+    className={`grid grid-cols-3 md:grid-cols-6 gap-[3px] p-2 md:gap-[12px] md:p-6 h-full min-h-screen items-center justify-items-center pointer-events-none relative transition-all duration-[1500ms] ease-out`}
+    style={{ 
+      zIndex: 0,
+      transform: isTransitioning ? 'scale(4) translateZ(0)' : 'scale(1) translateZ(0)',
+      opacity: isTransitioning ? 0 : 1,
+      filter: isTransitioning ? 'blur(15px)' : 'blur(0px)',
+      transformOrigin: 'center center'
+    }}
+  >
           {Array.from({ length: 24 }).map((_, i) => {
             const m = cards[i]
             const col = i % 6
@@ -68,7 +80,12 @@ const Welcome = () => {
               <div
                 key={i}
                 className={`w-full h-44 sm:h-56 md:h-72 overflow-hidden rounded-lg shadow-lg float`}
-                style={{ transform: `translateX(${rowShift}px) rotate(${rowRotate}) translateY(${translateY}px) rotate(${itemRotate})`, filter: 'brightness(0.82)', backgroundColor: '#111', zIndex: z }}
+                style={{ 
+                  transform: `translateX(${rowShift}px) rotate(${rowRotate}) translateY(${translateY}px) rotate(${itemRotate})`, 
+                  filter: 'brightness(0.82)', 
+                  backgroundColor: '#111', 
+                  zIndex: z
+                }}
               >
                 {m ? (
                   <img src={`https://image.tmdb.org/t/p/w500${m.poster_path}`} alt={m.title || m.name} className="w-full h-full object-cover" />
@@ -82,7 +99,13 @@ const Welcome = () => {
       </div>
 
   {/* Foreground content */}
-    <div className="relative z-20 flex flex-col justify-center min-h-screen px-4 md:px-12 lg:px-20">
+    <div 
+      className="relative z-20 flex flex-col justify-center min-h-screen px-4 md:px-12 lg:px-20 transition-all duration-[1500ms] ease-out"
+      style={{
+        opacity: isTransitioning ? 0 : 1,
+        transform: isTransitioning ? 'scale(0.8) translateZ(0)' : 'scale(1) translateZ(0)'
+      }}
+    >
     <div className="w-full mx-auto text-center">
           <h1 className="mb-4 w-full text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-tight whitespace-nowrap">
             <span className="text-white">Welcome to </span>
@@ -91,7 +114,10 @@ const Welcome = () => {
           <p className="max-w-xl text-white/80 mb-8 mx-auto text-center">Browse trending movies and TV shows, build a watchlist, and enjoy an immersive experience.</p>
           <div className="flex gap-4 justify-center">
             <button
-              onClick={() => navigate('/home')}
+              onClick={() => {
+                startTransition()
+                setTimeout(() => navigate('/home'), 1500)
+              }}
               className="px-6 py-3 rounded-full text-white font-semibold bg-gradient-to-r from-red-900 to-red-700 hover:from-red-800 hover:to-red-600 inline-flex items-center"
             >
               Go to Home

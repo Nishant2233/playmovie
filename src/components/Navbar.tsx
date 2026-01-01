@@ -6,11 +6,13 @@ import { Link, NavLink, useNavigate, useLocation } from "react-router-dom"
 import { useContext, useEffect, useState } from "react"
 import { SearchResultContext } from "../contex/searchResult.context"
 import { Search, Menu, X } from "lucide-react"
+import { usePageTransition } from "../contex/pageTransition.context"
 
 const Navbar = () => {
   const navigate=useNavigate()
   const location = useLocation()
   const {searchText,setSearchText}=useContext(SearchResultContext)
+  const { startTransition } = usePageTransition()
   const [open, setOpen] = useState(false)
   const [solid, setSolid] = useState(false)
   const [hidden, setHidden] = useState(false)
@@ -41,7 +43,16 @@ const Navbar = () => {
    setSearchText(e.target.value)
     navigate(`/search/${e.target.value}`)
     if(e.target.value.length===0){
-      navigate("/home")
+      startTransition()
+      setTimeout(() => navigate("/home"), 1500)
+    }
+  }
+
+  const handleNavigateToHome = () => {
+    if (location.pathname !== '/home') {
+      startTransition()
+      // Wait for zoom animation to complete (1500ms) before navigating
+      setTimeout(() => navigate('/home'), 1500)
     }
   }
   const handleSubmit=(e:React.FormEvent<HTMLFormElement>)=>{
@@ -56,7 +67,7 @@ const Navbar = () => {
       
       <div className="flex md:hidden items-center justify- w-full ">
         <div></div> 
-        <button onClick={()=> navigate('/home')} className="shrink-0">
+        <button onClick={handleNavigateToHome} className="shrink-0">
           <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer elevate" />
         </button>
 
@@ -65,18 +76,28 @@ const Navbar = () => {
       <div className="hidden md:flex items-center justify-center flex-1">
         <div className="px-3 py-2 rounded-[2rem] bg-[#0b0b0b]/70 border border-white/10 backdrop-blur flex items-center gap-1 w-full max-w-6xl">
           {/* Logo inside the unified navbar */}
-          <button onClick={()=> navigate('/home')} className="shrink-0 mr-2">
+          <button onClick={handleNavigateToHome} className="shrink-0 mr-2">
             <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer elevate" />
           </button>
           {/* Primary links */}
           {[{to:'/home',label:'Home'},{to:'/movies',label:'Movies'},{to:'/tvshows',label:'TV Shows'},{to:'/top-imdb',label:'Top IMDb'},{to:'/anime',label:'Anime'}].map(link => (
-            <NavLink key={link.to} to={link.to} className={({isActive})=>`relative px-4 py-2 rounded-xl transition-colors ${isActive? 'text-white' : 'text-white/80 hover:text-white'}`}>
-               {({isActive}) => (
-                 <span className="relative">{link.label}
-                  <span className={`absolute -bottom-1 left-0 right-0 h-[2px] rounded-full bg-purple-600 transition-opacity ${isActive? 'opacity-100' : 'opacity-0 group-hover:opacity-80 '}`}></span>
-                 </span>
-               )}
-             </NavLink>
+            link.to === '/home' ? (
+              <button
+                key={link.to}
+                onClick={handleNavigateToHome}
+                className="relative px-4 py-2 rounded-xl transition-colors text-white/80 hover:text-white"
+              >
+                <span className="relative">{link.label}</span>
+              </button>
+            ) : (
+              <NavLink key={link.to} to={link.to} className={({isActive})=>`relative px-4 py-2 rounded-xl transition-colors ${isActive? 'text-white' : 'text-white/80 hover:text-white'}`}>
+                 {({isActive}) => (
+                   <span className="relative">{link.label}
+                    <span className={`absolute -bottom-1 left-0 right-0 h-[2px] rounded-full bg-purple-600 transition-opacity ${isActive? 'opacity-100' : 'opacity-0 group-hover:opacity-80 '}`}></span>
+                   </span>
+                 )}
+               </NavLink>
+            )
            ))}
            <div className="px-3 py-2"><Genres /></div>
           <div className="flex-1" />
@@ -132,13 +153,17 @@ const Navbar = () => {
              </div>
            </form>
            <div className="grid gap-4 text-base">
-             <Link 
-               to="/home" 
-               onClick={()=> setOpen(false)} 
-               className="text-white hover:text-[var(--accent)] transition-colors duration-200 py-2"
-             >
-               Home
-             </Link>
+            <Link 
+              to="/home" 
+              onClick={(e) => { 
+                e.preventDefault()
+                setOpen(false)
+                handleNavigateToHome()
+              }} 
+              className="text-white hover:text-[var(--accent)] transition-colors duration-200 py-2"
+            >
+              Home
+            </Link>
              <Link 
                to="/movies" 
                onClick={()=> setOpen(false)} 
