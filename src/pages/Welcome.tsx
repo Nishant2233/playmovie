@@ -1,12 +1,10 @@
 import useMovieList from "../hooks/UseMovies"
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { usePageTransition } from "../contex/pageTransition.context"
 
 const Welcome = () => {
   const { movieLists } = useMovieList(undefined, 1)
   const navigate = useNavigate()
-  const { startTransition, isTransitioning } = usePageTransition()
 
   // typewriter state for the PlayMovie word (run once on mount)
   const fullWord = 'PlayMovie'
@@ -54,14 +52,8 @@ const Welcome = () => {
   {/* collage grid: responsive - 3 cols on mobile, 6 on md+; fills viewport on mobile */}
   <div 
     id="welcome-cards-container"
-    className={`grid grid-cols-3 md:grid-cols-6 gap-[3px] p-2 md:gap-[12px] md:p-6 h-full min-h-screen items-center justify-items-center pointer-events-none relative transition-all duration-[1500ms] ease-out`}
-    style={{ 
-      zIndex: 0,
-      transform: isTransitioning ? 'scale(4) translateZ(0)' : 'scale(1) translateZ(0)',
-      opacity: isTransitioning ? 0 : 1,
-      filter: isTransitioning ? 'blur(15px)' : 'blur(0px)',
-      transformOrigin: 'center center'
-    }}
+    className={`grid grid-cols-3 md:grid-cols-6 gap-[3px] p-2 md:gap-[12px] md:p-6 h-full min-h-screen items-center justify-items-center pointer-events-none relative`}
+    style={{ zIndex: 0 }}
   >
           {Array.from({ length: 24 }).map((_, i) => {
             const m = cards[i]
@@ -100,11 +92,7 @@ const Welcome = () => {
 
   {/* Foreground content */}
     <div 
-      className="relative z-20 flex flex-col justify-center min-h-screen px-4 md:px-12 lg:px-20 transition-all duration-[1500ms] ease-out"
-      style={{
-        opacity: isTransitioning ? 0 : 1,
-        transform: isTransitioning ? 'scale(0.8) translateZ(0)' : 'scale(1) translateZ(0)'
-      }}
+      className="relative z-20 flex flex-col justify-center min-h-screen px-4 md:px-12 lg:px-20"
     >
     <div className="w-full mx-auto text-center">
           <h1 className="mb-4 w-full text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-tight whitespace-nowrap">
