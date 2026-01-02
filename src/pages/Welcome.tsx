@@ -114,10 +114,7 @@ const Welcome = () => {
           <p className="max-w-xl text-white/80 mb-8 mx-auto text-center">Browse trending movies and TV shows, build a watchlist, and enjoy an immersive experience.</p>
           <div className="flex gap-4 justify-center">
             <button
-              onClick={() => {
-                startTransition()
-                setTimeout(() => navigate('/home'), 1500)
-              }}
+              onClick={() => navigate('/home')}
               className="px-6 py-3 rounded-full text-white font-semibold bg-gradient-to-r from-red-900 to-red-700 hover:from-red-800 hover:to-red-600 inline-flex items-center"
             >
               Go to Home
