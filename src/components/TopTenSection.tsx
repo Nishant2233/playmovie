@@ -56,7 +56,7 @@ const SlidingSection = ({ title, items, type }: SlidingSectionProps) => {
   if (items.length === 0) return null
 
   return (
-    <div className="px-5 md:px-10 mb-10">
+    <div className="px-0 md:px-10 mb-10">
       <div className="flex items-center gap-2 mb-4">
         <span className="w-1 h-6 bg-[var(--accent)]" />
         <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>

@@ -5,7 +5,7 @@ const ContentRow = ({ title, items }: { title: string; items?: any[] }) => {
   const scroller = useRef<HTMLDivElement>(null)
   const scrollBy = (d: number) => scroller.current?.scrollBy({ left: d*400, behavior: 'smooth' })
   return (
-    <div className="px-5 md:px-10 mb-8">
+    <div className="px-0 md:px-10 mb-8">
       <div className="flex items-end justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="w-1 h-6 bg-purple-600" />

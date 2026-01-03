@@ -10,10 +10,10 @@ const SearchList = () => {
 
 
   return (
-    <div className="px-5 md:px-10 grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-10">
+    <div className="px-0 md:px-10 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4 mb-10">
      {searchData?.map((data: any)=>{
          return(
-        <div key={data.id}>
+        <div key={data.id} className="px-2 md:px-0 box-border">
         {data.media_type==="movie"?(
             <MovieCard movieResult={data} />
         ):(<TvShowCard tvShowResult={data} />)}

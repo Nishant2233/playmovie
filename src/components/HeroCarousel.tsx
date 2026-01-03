@@ -50,7 +50,7 @@ const HeroCarousel = () => {
       </div>
 
       {/* Info section below */}
-      <div className="px-5 md:px-10 py-6 text-white">
+      <div className="px-0 md:px-10 py-6 text-white">
         <div className="flex gap-6 items-start justify-between">
           {current.poster_path && (
             <img src={`https://image.tmdb.org/t/p/w300${current.poster_path}`} alt={title} className="w-28 md:w-40 rounded-lg shadow-lg" />

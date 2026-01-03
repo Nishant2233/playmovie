@@ -14,14 +14,14 @@ const GridSection = ({ title, items, kind = 'movie' }: Props) => {
     return <MovieCard movieResult={it} />
   }
   return (
-    <div className="px-5 md:px-10 mb-10">
+    <div className="px-0 md:px-10 mb-10">
       <div className="flex items-center gap-2 mb-4">
         <span className="w-1 h-6 bg-purple-600" />
         <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
       </div>
-      <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
         {items?.slice(0,12).map((it:any) => (
-          <div key={it.id}>{render(it)}</div>
+          <div key={it.id} className="px-2 md:px-0 box-border">{render(it)}</div>
         ))}
       </div>
     </div>
