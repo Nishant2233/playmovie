@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import apiClient from "../services/api-client"
-import { useDetails } from "../contex/details.context"
+import { useNavigate } from "react-router-dom"
 import { useWatchlist } from "../contex/watchlist.context"
 
 type Media = { id: number; title?: string; name?: string; backdrop_path?: string; poster_path?: string; vote_average?: number; overview?: string; release_date?: string; first_air_date?: string }
@@ -8,7 +8,7 @@ type Media = { id: number; title?: string; name?: string; backdrop_path?: string
 const HeroCarousel = () => {
   const [slides, setSlides] = useState<Media[]>([])
   const [index, setIndex] = useState(0)
-  const { open } = useDetails()
+  const navigate = useNavigate()
   const { add, has } = useWatchlist()
 
   useEffect(() => {
@@ -30,14 +30,14 @@ const HeroCarousel = () => {
   return (
     <div className="relative w-full overflow-hidden -mt-20">
       {/* Backdrop slideshow */}
-      <div className="relative aspect-[16/7] lg:aspect-[16/6]">
+      <div className="relative aspect-square md:aspect-[16/7] lg:aspect-[16/6]">
         {slides.map((s, i) => (
           <img key={s.id} src={`https://image.tmdb.org/t/p/original${s.backdrop_path}`} alt={title} className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i===index?'opacity-100':'opacity-0'}`} />
         ))}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
         {/* Center play button */}
         <button
-          onClick={()=> open(current.id, 'movie')}
+          onClick={() => navigate(`/details/movie/${current.id}`)}
           className="absolute inset-0 m-auto w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur flex items-center justify-center text-white text-2xl"
           aria-label="Open details"
         >
