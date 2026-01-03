@@ -12,6 +12,7 @@ const Navbar = () => {
   const location = useLocation()
   const {searchText,setSearchText}=useContext(SearchResultContext)
   const [open, setOpen] = useState(false)
+  const [slideIn, setSlideIn] = useState(false)
   const [solid, setSolid] = useState(false)
   const [hidden, setHidden] = useState(false)
   useEffect(()=>{
@@ -38,9 +39,26 @@ const Navbar = () => {
   }
   // hide navbar on the welcome page
   if (location.pathname === "/") return null
+  useEffect(()=>{
+    if(open){
+      // trigger slide-in on next frame so transition animates from -translate-y-full -> translate-y-0
+      requestAnimationFrame(()=> setSlideIn(true))
+    } else {
+      setSlideIn(false)
+    }
+  },[open])
+
   return (
    <header className={`sticky top-0 z-30 ${solid? 'bg-transparent' : 'bg-transparent'} transition-all duration-300 ${hidden? '-translate-y-full' : 'translate-y-0'}`}>
      <div className="px-4 md:px-10 h-20 flex items-center justify-between gap-4">
+      {/* Mobile bar: logo left, hamburger right */}
+      <div className="flex items-center justify-between w-full md:hidden">
+        <button onClick={()=> navigate('/home')} className="shrink-0">
+          <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer" />
+        </button>
+        <button className="inline-flex items-center justify-center w-10 h-10 rounded-md border border-white/20" onClick={()=> setOpen(!open)} aria-label="Menu">≡</button>
+      </div>
+
       <div className="hidden md:flex items-center justify-center flex-1">
         <div className="px-3 py-2 rounded-[2rem] bg-[#0b0b0b]/70 border border-white/10 backdrop-blur flex items-center gap-1 w-full max-w-6xl">
           {/* Logo inside the unified navbar */}
@@ -82,24 +100,39 @@ const Navbar = () => {
          </div>
        </div>
 
-       <button className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-white/20" onClick={()=> setOpen(!open)} aria-label="Menu">≡</button>
+       {/* desktop-only menu button placeholder (mobile handled above) */}
      </div>
-
      {open && (
-       <div className="md:hidden border-t border-white/10 px-4 pb-4">
-         <form onSubmit={handleSubmit} className="py-3">
-           <div className="relative">
-             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
-             <Input type="text" placeholder="Search" className="pl-9 border-gray-700 bg-[#0f0f0f] rounded-2xl w-full" value={searchText} onChange={handleChange} />
+       <div className="fixed inset-0 z-40">
+         <div onClick={()=> setOpen(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300" />
+         <div className={`absolute left-0 right-0 top-0 transform transition-transform duration-400 ${slideIn ? 'translate-y-0' : '-translate-y-full'}`}>
+          <div className="h-[60vh] min-h-[55vh] bg-black text-white pt-3 pb-3 px-4 max-h-full">
+            <div className="h-full flex flex-col">
+              <div>
+                <div className="flex items-center justify-between">
+                   <button onClick={()=> { setOpen(false); navigate('/home') }} className="shrink-0">
+                     <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer" />
+                   </button>
+                   <button onClick={()=> setOpen(false)} aria-label="Close menu" className="text-white text-2xl">×</button>
+                 </div>
+
+                 <nav className="mt-3 flex flex-col gap-3 items-center text-white text-lg overflow-auto">
+                   <Link to="/home" onClick={()=> setOpen(false)} className="w-full max-w-md text-center bg-black px-4 py-2 rounded-md">Home</Link>
+                   <Link to="/movies" onClick={()=> setOpen(false)} className="w-full max-w-md text-center bg-black px-4 py-2 rounded-md">Movies</Link>
+                   <Link to="/tvshows" onClick={()=> setOpen(false)} className="w-full max-w-md text-center bg-black px-4 py-2 rounded-md">TV Shows</Link>
+                   <Link to="/top-imdb" onClick={()=> setOpen(false)} className="w-full max-w-md text-center bg-black px-4 py-2 rounded-md">Top IMDb</Link>
+                   <Link to="/anime" onClick={()=> setOpen(false)} className="w-full max-w-md text-center bg-black px-4 py-2 rounded-md">Anime</Link>
+                   <div className="pt-1 w-full flex justify-center">
+                     <div className="w-full max-w-md bg-black px-4 py-2 rounded-md text-center"><Genres /></div>
+                   </div>
+                 </nav>
+                 </div>
+
+                 <div className="flex justify-center mt-3">
+                   <Link to="/watchlist" onClick={()=> setOpen(false)} className="w-full max-w-md px-5 py-3 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-lg font-semibold shadow-lg text-center">Watchlist</Link>
+                 </div>
+               </div>
            </div>
-         </form>
-         <div className="grid gap-3 text-sm">
-           <Link to="/home" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Home</Link>
-           <Link to="/movies" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Movies</Link>
-           <Link to="/tvshows" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">TV Shows</Link>
-           <Link to="/top-imdb" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Top IMDb</Link>
-           <Genres />
-           <Link to="/watchlist" onClick={()=> setOpen(false)} className="px-4 py-2 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-center font-semibold">Watchlist</Link>
          </div>
        </div>
      )}
