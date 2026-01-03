@@ -172,7 +172,7 @@ const AdvancedFilters = () => {
                 {/* Sort By */}
                 <div>
                   <label className="block text-sm font-semibold text-white/90 mb-3">Sort By</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
                     {sortOptions.map(opt => (
                       <button
                         key={opt.value}

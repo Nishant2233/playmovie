@@ -10,7 +10,7 @@ const Trandingmovie = () => {
     <div>
         <h1 className="text-4xl font-semibold p-5 py-8">trandingMovie</h1>
          </div>
-            <div className="grid lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-2 gap-y-3">
+            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-3">
           {(trandingData ?? []).map((movie: any)=> (
             <div key = {movie.id}>
                 <MovieCard movieResult={movie}/>

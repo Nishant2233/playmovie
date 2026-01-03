@@ -301,7 +301,7 @@ const Watchlist = () => {
       {items.length === 0 ? (
         <div className="text-neutral-400">Your watchlist is empty.</div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-10">
+        <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-10">
           {items.map(item => (
             <div key={item.id} className="relative group">
               <MovieCard movieResult={item as any} />
@@ -386,7 +386,7 @@ const Watchlist = () => {
               {shared.items.length === 0 ? (
                 <div className="text-neutral-400">This watchlist is empty.</div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {shared.items.map(item => (
                     <div key={item.id} className="relative group">
                       <MovieCard movieResult={item as any} />

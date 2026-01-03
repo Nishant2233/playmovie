@@ -48,7 +48,7 @@ const TopImdb = () => {
       {(filter==='all' || filter==='movie') && (
         <>
           {filter==='all' && <h3 className="text-xl font-semibold mb-3">Movies</h3>}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
             {movies?.map(m => (
               <MovieCard key={m.id} movieResult={m} />
             ))}
@@ -60,7 +60,7 @@ const TopImdb = () => {
       {(filter==='all' || filter==='tv') && (
         <>
           {filter==='all' && <h3 className="text-xl font-semibold mb-3">TV Shows</h3>}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
             {tv?.map(t => (
               <TvShowCard key={t.id} tvShowResult={t} />
             ))}
