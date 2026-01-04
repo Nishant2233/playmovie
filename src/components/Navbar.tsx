@@ -2,6 +2,7 @@
 import pmlogo from "../assets/pmlogo.jpg"
 import Genres from "./Genres"
 import { Input } from "./ui/input"
+import { Card, CardContent } from "./ui/card"
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom"
 import { useContext, useEffect, useState } from "react"
 import { SearchResultContext } from "../contex/searchResult.context"
@@ -41,6 +42,11 @@ const Navbar = () => {
   return (
    <header className={`sticky top-0 z-30 ${solid? 'bg-transparent' : 'bg-transparent'} transition-all duration-300 ${hidden? '-translate-y-full' : 'translate-y-0'}`}>
      <div className="px-4 md:px-10 h-20 flex items-center justify-between gap-4">
+      {/* Mobile logo on the left (visible only on small screens) */}
+      <button onClick={()=> navigate('/home')} className="md:hidden flex items-center shrink-0">
+        <img src={pmlogo} alt="logo" className="h-10 w-10 rounded-full object-cover cursor-pointer" />
+      </button>
+
       <div className="hidden md:flex items-center justify-center flex-1">
         <div className="px-3 py-2 rounded-[2rem] bg-[#0b0b0b]/70 border border-white/10 backdrop-blur flex items-center gap-1 w-full max-w-6xl">
           {/* Logo inside the unified navbar */}
@@ -72,7 +78,7 @@ const Navbar = () => {
           <form onSubmit={handleSubmit} className="hidden md:block">
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
-              <Input type="text" placeholder="Search" className="pl-9 border-gray-700 bg-[#0f0f0f] rounded-2xl w-64"
+              <Input type="text" placeholder="Search" className="pl-9 border-gray-700 bg-[#0f0f0f] rounded-2xl w-64 text-white placeholder-white/60"
                value={searchText} onChange={handleChange} />
             </div>
           </form>
@@ -82,25 +88,30 @@ const Navbar = () => {
          </div>
        </div>
 
-       <button className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-white/20" onClick={()=> setOpen(!open)} aria-label="Menu">≡</button>
-     </div>
+       <button className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-white/20" onClick={()=> setOpen(!open)} aria-label="Menu">{open ? '✕' : '≡'}</button>
+      </div>
 
      {open && (
-       <div className="md:hidden border-t border-white/10 px-4 pb-4">
-         <form onSubmit={handleSubmit} className="py-3">
-           <div className="relative">
-             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
-             <Input type="text" placeholder="Search" className="pl-9 border-gray-700 bg-[#0f0f0f] rounded-2xl w-full" value={searchText} onChange={handleChange} />
-           </div>
-         </form>
-         <div className="grid gap-3 text-sm">
-           <Link to="/home" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Home</Link>
-           <Link to="/movies" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Movies</Link>
-           <Link to="/tvshows" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">TV Shows</Link>
-           <Link to="/top-imdb" onClick={()=> setOpen(false)} className="hover:text-[var(--accent)]">Top IMDb</Link>
-           <Genres />
-           <Link to="/watchlist" onClick={()=> setOpen(false)} className="px-4 py-2 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-center font-semibold">Watchlist</Link>
-         </div>
+       <div className="md:hidden px-4 pb-4">
+        <Card className="bg-[#0b0b0b]/70 border border-white/10">
+          <CardContent className="py-3">
+             <form onSubmit={handleSubmit} className="py-3">
+               <div className="relative">
+                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
+                 <Input type="text" placeholder="Search" className="pl-9 border-gray-700 bg-[#0f0f0f] rounded-2xl w-full text-white placeholder-white/60" value={searchText} onChange={handleChange} />
+               </div>
+             </form>
+             <div className="grid gap-3 text-sm">
+              <Link to="/home" onClick={()=> setOpen(false)} className="text-white text-lg">Home</Link>
+              <Link to="/movies" onClick={()=> setOpen(false)} className="text-white text-lg">Movies</Link>
+              <Link to="/tvshows" onClick={()=> setOpen(false)} className="text-white text-lg">TV Shows</Link>
+              <Link to="/anime" onClick={()=> setOpen(false)} className="text-white text-lg">Anime</Link>
+              <Link to="/top-imdb" onClick={()=> setOpen(false)} className="text-white text-lg hover:text-[var(--accent)]">Top IMDb</Link>
+              <Genres />
+              <Link to="/watchlist" onClick={()=> setOpen(false)} className="px-4 py-2 rounded-full bg-purple-600/90 hover:bg-purple-600 text-white text-center font-semibold">Watchlist</Link>
+             </div>
+           </CardContent>
+         </Card>
        </div>
      )}
    </header>
