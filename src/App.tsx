@@ -20,14 +20,14 @@ function App() {
   }, [location.pathname])
 
   return (
-    <>
+    <div className="overflow-x-hidden max-w-full">
       <Navbar />
       <div className={`transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'}`}>
         <AllRoutes />
       </div>
       <DetailsModal />
       <Analytics />
-    </>
+    </div>
   )
 }
 
