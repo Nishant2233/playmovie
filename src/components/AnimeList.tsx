@@ -13,8 +13,8 @@ const AnimeList = () => {
   }, [page])
 
   return (
-    <div className="px-0 md:px-10 mb-10">
-      <div className="relative -mx-0 md:-mx-10 px-0 md:px-10 pt-8 pb-8 mb-8 overflow-hidden">
+    <div className="px-2 md:px-10 mb-10 w-full max-w-full overflow-x-hidden">
+      <div className="relative -mx-2 md:-mx-10 px-2 md:px-10 pt-8 pb-8 mb-8 overflow-hidden">
         <div className="absolute inset-0 bg-[#0a0f1d]/80 backdrop-blur-sm" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(147,51,234,0.12)_0%,_transparent_60%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,_transparent_0%,_rgba(0,0,0,0.3)_100%)]" />
@@ -23,9 +23,9 @@ const AnimeList = () => {
           <p className="text-sm text-white/70">Sorted by popularity (JP origin)</p>
         </div>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 md:gap-4">
         {anime?.map((show) => (
-          <div key={show.id}>
+          <div key={show.id} className="w-full">
             <TvShowCard tvShowResult={show} />
           </div>
         ))}

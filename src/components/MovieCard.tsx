@@ -12,14 +12,14 @@ const MovieCard = ({ movieResult }: Props) => {
     const navigate = useNavigate()
     const { add, remove, has } = useWatchlist()
     return (
-        <Card className="border-0 bg-transparent">
-            <CardContent className="px-0">
-                <div className="relative group">
+        <Card className="border-0 bg-transparent w-full">
+            <CardContent className="px-0 w-full">
+                <div className="relative group w-full">
                     <img
                         src={`https://image.tmdb.org/t/p/w500${movieResult.poster_path}`}
                         alt={movieResult.title || movieResult.name || "poster"}
                         loading="lazy"
-                        className="w-full aspect-[2/3] object-cover rounded-md cursor-pointer transition-transform duration-300 group-hover:scale-[1.02]"
+                        className="w-full max-w-full aspect-[2/3] object-cover rounded-md cursor-pointer transition-transform duration-300 group-hover:scale-[1.02]"
                         onClick={()=>{ navigate(`/details/movie/${movieResult.id}`) }}
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-md" />
@@ -44,7 +44,7 @@ const MovieCard = ({ movieResult }: Props) => {
                         </div>
                       </div>
                     </div>
-                    <h1 className="mt-3 text-white">{movieResult.title ? movieResult.title : movieResult.name}</h1>
+                    <h1 className="mt-2 md:mt-3 text-white text-xs md:text-base line-clamp-2">{movieResult.title ? movieResult.title : movieResult.name}</h1>
                 </div>
             </CardContent>
         </Card>

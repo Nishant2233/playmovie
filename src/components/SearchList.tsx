@@ -10,10 +10,11 @@ const SearchList = () => {
 
 
   return (
-    <div className="px-0 md:px-10 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4 mb-10">
+    <div className="px-2 md:px-10 mb-10 w-full max-w-full overflow-x-hidden">
+      <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 md:gap-4">
      {searchData?.map((data: any)=>{
          return(
-        <div key={data.id} className="px-2 md:px-0 box-border">
+        <div key={data.id} className="w-full">
         {data.media_type==="movie"?(
             <MovieCard movieResult={data} />
         ):(<TvShowCard tvShowResult={data} />)}
@@ -21,6 +22,7 @@ const SearchList = () => {
     
     )
      })}
+      </div>
 
    </div>
   )
