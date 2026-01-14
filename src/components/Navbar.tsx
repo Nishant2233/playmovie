@@ -59,7 +59,8 @@ const Navbar = () => {
              {to:'/home',label:'Home'},
              {to:'/movies',label:'Movies'},
              {to:'/tvshows',label:'TV Shows'},
-             {to:'/top-imdb',label:'Top IMDb'}
+             {to:'/top-imdb',label:'Top IMDb'},
+             {to:'/anime',label:'Anime'}
            ].map(link => (
             <NavLink key={link.to} to={link.to} className={({isActive})=>`relative px-4 py-2 rounded-xl transition-colors ${isActive? 'text-white' : 'text-white/80 hover:text-white'}`}>
                {({isActive}) => (
