@@ -3,29 +3,19 @@ import { useWatchlist } from "../contex/watchlist.context"
 import { useSharedWatchlist } from "../contex/sharedWatchlist.context"
 import MovieCard from "./MovieCard"
 import { Share2, Copy, Check, X, Plus, Trash2 } from "lucide-react"
+import apiClient from "../services/api-client"
 
 // Helper functions for URL-safe encoding/decoding
 // Using a reliable method that works in all environments including production
 // Kept for backward compatibility with encoded link format
-const _encodeWatchlist = (data: any): string => {
+const encodeWatchlist = (data: any): string => {
   try {
     const jsonString = JSON.stringify(data)
-    // Convert string to base64 using UTF-8 safe method
-    let base64: string
-    try {
-      // Modern approach using TextEncoder (available in all modern browsers)
-      const encoder = new TextEncoder()
-      const bytes = encoder.encode(jsonString)
-      // Convert Uint8Array to string for btoa (safer method for large arrays)
-      const binaryString = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('')
-      base64 = btoa(binaryString)
-    } catch {
-      // Fallback: encode URI component first, then convert to base64
-      const uriEncoded = encodeURIComponent(jsonString)
-      base64 = btoa(uriEncoded)
-    }
-    // URL-encode the base64 string to make it URL-safe
-    return encodeURIComponent(base64)
+    // Base64url (no % encoding) keeps links much shorter.
+    const bytes = new TextEncoder().encode(jsonString)
+    const binaryString = Array.from(bytes, (b) => String.fromCharCode(b)).join("")
+    const base64 = btoa(binaryString)
+    return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "")
   } catch (error) {
     console.error("Encoding error:", error)
     throw error
@@ -34,8 +24,14 @@ const _encodeWatchlist = (data: any): string => {
 
 const decodeWatchlist = (encoded: string): any => {
   try {
-    // URL-decode first to get the base64 string
-    const base64 = decodeURIComponent(encoded)
+    // Accept both:
+    // - current base64url tokens (short)
+    // - older encodeURIComponent(base64) tokens (long)
+    const maybeDecoded = encoded.includes("%") ? decodeURIComponent(encoded) : encoded
+    const base64 =
+      maybeDecoded.includes("-") || maybeDecoded.includes("_")
+        ? maybeDecoded.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((maybeDecoded.length + 3) % 4)
+        : maybeDecoded
     // Decode base64
     let jsonString: string
     try {
@@ -59,6 +55,41 @@ const decodeWatchlist = (encoded: string): any => {
   }
 }
 
+type SharedPayloadV3 = {
+  v: 3
+  id: string
+  s: string
+  i: number[]
+}
+
+const isSharedPayloadV3 = (data: any): data is SharedPayloadV3 => {
+  return (
+    data &&
+    data.v === 3 &&
+    typeof data.id === "string" &&
+    typeof data.s === "string" &&
+    Array.isArray(data.i) &&
+    data.i.every((x: any) => typeof x === "number")
+  )
+}
+
+const fetchMovieItemsByIds = async (ids: number[]) => {
+  const unique = Array.from(new Set(ids)).filter(Boolean)
+  const results = await Promise.all(
+    unique.map(async (movieId) => {
+      try {
+        const r = await apiClient.get(`/movie/${movieId}`)
+        const item = r.data
+        if (!item?.id || !item?.poster_path) return null
+        return { id: item.id, title: item.title, name: item.name, poster_path: item.poster_path }
+      } catch {
+        return null
+      }
+    })
+  )
+  return results.filter(Boolean) as Array<{ id: number; title?: string; name?: string; poster_path: string }>
+}
+
 const Watchlist = () => {
   const { items, remove, add } = useWatchlist()
   const { sharedWatchlists, shareWatchlist, addSharedWatchlist, removeSharedWatchlist } = useSharedWatchlist()
@@ -76,11 +107,13 @@ const Watchlist = () => {
     }
     const name = prompt("Enter your name:") || "Anonymous"
     const id = shareWatchlist(items, name)
-    // Use short URL with just the ID (encodeWatchlist kept for backward compatibility)
+    // Share link must be self-contained to work across devices/browsers.
+    // We encode {id, senderName, items} into the URL so the recipient can import it.
     try {
-      // Keep encoding logic available for backward compatibility
-      void _encodeWatchlist({ id, senderName: name, items })
-      const shortLink = `${window.location.origin}/watchlist?share=${id}`
+      // v3: keep payload minimal for shorter links (IDs only)
+      const payload: SharedPayloadV3 = { v: 3, id, s: name, i: items.map((x) => x.id) }
+      const encoded = encodeWatchlist(payload)
+      const shortLink = `${window.location.origin}/watchlist?share=${encoded}`
       setShareId(id)
       setShareLink(shortLink)
       setShowShareModal(true)
@@ -96,7 +129,7 @@ const Watchlist = () => {
     setTimeout(() => setCopied(""), 2000)
   }
 
-  const handleAddSharedWatchlist = () => {
+  const handleAddSharedWatchlist = async () => {
     if (!inputId.trim()) {
       alert("Please enter a watchlist ID or link")
       return
@@ -116,8 +149,23 @@ const Watchlist = () => {
       // Decode URL-encoded data first
       try {
         const watchlistData = decodeWatchlist(encodedData)
-        
-        // Validate the data
+
+        // v3 minimal payload (short links)
+        if (isSharedPayloadV3(watchlistData)) {
+          const fetched = await fetchMovieItemsByIds(watchlistData.i)
+          if (fetched.length === 0) throw new Error("No items found")
+          if (sharedWatchlists.some((w) => w.id === watchlistData.id)) {
+            alert("This watchlist is already added!")
+            return
+          }
+          addSharedWatchlist(watchlistData.id, watchlistData.s || senderName || "Anonymous", fetched)
+          alert(`Successfully added ${watchlistData.s || senderName || "Anonymous"}'s watchlist!`)
+          setInputId("")
+          setSenderName("")
+          return
+        }
+
+        // Legacy payload with full items
         if (!watchlistData.id || !watchlistData.items || !Array.isArray(watchlistData.items)) {
           throw new Error("Invalid watchlist data")
         }
@@ -139,40 +187,10 @@ const Watchlist = () => {
         setInputId("")
         setSenderName("")
       } catch (decodeError) {
-        // If decoding fails, it might be just an ID (old format)
-        // In that case, we need the sender name
-        if (!senderName.trim()) {
-          alert("Please enter sender name. If you have a share link, use that instead.")
-          return
-        }
-        // Check if we can find it in our own shared watchlists (if we shared it)
-        const existing = sharedWatchlists.find(w => w.id === encodedData)
-        if (existing) {
-          const watchlistData = {
-            id: existing.id,
-            senderName: senderName || existing.senderName,
-            items: existing.items
-          }
-          
-          // Check if already exists
-          if (sharedWatchlists.some(w => w.id === watchlistData.id)) {
-            alert("This watchlist is already added!")
-            return
-          }
-
-          addSharedWatchlist(
-            watchlistData.id,
-            watchlistData.senderName,
-            watchlistData.items
-          )
-
-          alert(`Successfully added ${watchlistData.senderName}'s watchlist!`)
-          setInputId("")
-          setSenderName("")
-        } else {
-          alert("Invalid share link or ID. Please use the full share link provided by the sender.")
-          console.error("Decode error:", decodeError)
-        }
+        // If decoding fails, it's likely an old ID-only link.
+        // Without a backend, ID-only links cannot be imported on another device/browser.
+        alert("This share link looks like an old format (ID-only) and can't be imported on another device. Ask the sender to re-share using the new link.")
+        console.error("Decode error:", decodeError)
       }
     } catch (error) {
       alert("Error adding watchlist. Please check the link or ID and try again.")
@@ -193,18 +211,22 @@ const Watchlist = () => {
     const shareParam = urlParams.get("share")
     if (shareParam) {
       setInputId(shareParam)
-      // First try to find by ID (short format)
-      const existing = sharedWatchlists.find(w => w.id === shareParam)
-      if (existing) {
-        // Already exists, clean URL
-        window.history.replaceState({}, "", "/watchlist")
-        return
-      }
-      
-      // Try to auto-add if we can decode it (long encoded format)
+      // Auto-import for self-contained (encoded) links
       try {
         const watchlistData = decodeWatchlist(shareParam)
-        
+
+        if (isSharedPayloadV3(watchlistData)) {
+          fetchMovieItemsByIds(watchlistData.i).then((fetched) => {
+            if (!fetched.length) return
+            const exists = sharedWatchlists.some((w) => w.id === watchlistData.id)
+            if (!exists) {
+              addSharedWatchlist(watchlistData.id, watchlistData.s, fetched)
+              window.history.replaceState({}, "", "/watchlist")
+            }
+          })
+          return
+        }
+
         if (watchlistData.items && Array.isArray(watchlistData.items) && watchlistData.senderName) {
           // Check if already exists
           const exists = sharedWatchlists.some(w => w.id === watchlistData.id)
@@ -219,8 +241,9 @@ const Watchlist = () => {
           }
         }
       } catch (e) {
-        // Not a valid encoded link, might be just an ID that needs to be added manually
-        console.log("Could not auto-decode share link, user can manually add it")
+        // If this is an old ID-only link, it cannot be resolved on another device (no backend).
+        // Keep the value in the input so the user can see what they pasted.
+        console.log("Could not decode share link (likely old ID-only format).")
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

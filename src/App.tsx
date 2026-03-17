@@ -22,7 +22,7 @@ function App() {
   return (
     <div className="overflow-x-hidden max-w-full">
       <Navbar />
-      <div className={`transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'} ${location.pathname === '/' ? '' : 'pt-[88px]'}`}>
         <AllRoutes />
       </div>
       <DetailsModal />

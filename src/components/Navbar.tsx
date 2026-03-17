@@ -4,7 +4,7 @@ import Genres from "./Genres"
 import { Input } from "./ui/input"
 import { Card, CardContent } from "./ui/card"
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { SearchResultContext } from "../contex/searchResult.context"
 import { Search } from "lucide-react"
 
@@ -15,17 +15,33 @@ const Navbar = () => {
   const [open, setOpen] = useState(false)
   const [solid, setSolid] = useState(false)
   const [hidden, setHidden] = useState(false)
+  const lastYRef = useRef(0)
   useEffect(()=>{
-    let last = window.scrollY
+    lastYRef.current = window.scrollY
     const onScroll = () => {
       const y = window.scrollY
       setSolid(y > 60)
-      setHidden(y > last && y > 120)
-      last = y
+
+      // Don't hide while mobile menu is open.
+      if (open) {
+        setHidden(false)
+        lastYRef.current = y
+        return
+      }
+
+      const lastY = lastYRef.current
+      const goingDown = y > lastY
+
+      // Always show near the top.
+      if (y < 80) setHidden(false)
+      else setHidden(goingDown)
+
+      lastYRef.current = y
     }
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  },[])
+
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  },[open])
   const handleChange=(e: React.ChangeEvent<HTMLInputElement> )=>{
    setSearchText(e.target.value)
     navigate(`/search/${e.target.value}`)
@@ -40,7 +56,7 @@ const Navbar = () => {
   // hide navbar on the welcome page
   if (location.pathname === "/") return null
   return (
-   <header className={`sticky top-0 z-30 ${solid? 'bg-transparent' : 'bg-transparent'} transition-all duration-300 ${hidden? '-translate-y-full' : 'translate-y-0'}`}>
+   <header className={`fixed top-0 left-0 right-0 z-30 ${solid? 'bg-transparent' : 'bg-transparent'} transform transition-transform duration-300 ${hidden? '-translate-y-full' : 'translate-y-0'}`}>
      <div className="px-4 md:px-10 h-20 flex items-center justify-between gap-4">
       {/* Mobile logo on the left (visible only on small screens) */}
       <button onClick={()=> navigate('/home')} className="md:hidden flex items-center shrink-0">
