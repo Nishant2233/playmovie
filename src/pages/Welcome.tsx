@@ -15,16 +15,11 @@ const Welcome = () => {
   const [typingDone, setTypingDone] = useState(false)
   const [showContent, setShowContent] = useState(false)
 
-  // Show content after 2 seconds
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowContent(true)
-    }, 2000)
-
+    const timer = setTimeout(() => setShowContent(true), 2000)
     return () => clearTimeout(timer)
   }, [])
 
-  // Typewriter effect
   useEffect(() => {
     if (!showContent) return
 
@@ -94,11 +89,12 @@ const Welcome = () => {
           display: none;
         }
 
-        @keyframes zoom-out-in {
+        @keyframes zoom-in-fade {
           0% {
             opacity: 0;
-            transform: scale(1.15);
+            transform: scale(0.85);
           }
+
           100% {
             opacity: 1;
             transform: scale(1);
@@ -106,14 +102,14 @@ const Welcome = () => {
         }
 
         .zoom-out-in {
-          animation: zoom-out-in 0.8s ease-out forwards;
+          animation: zoom-in-fade 0.8s ease-out forwards;
         }
       `}</style>
 
       {/* Poster background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
 
-        {/* Dark overlay (gets darker when content appears) */}
+        {/* Overlay */}
         <div
           className="absolute inset-0 z-10 transition-all duration-700"
           style={{
@@ -131,9 +127,13 @@ const Welcome = () => {
           }}
         />
 
-        <div className="absolute inset-0 grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 px-2 md:px-4 opacity-95">
+        {/* Mobile fix: full viewport height */}
+        <div className="absolute inset-0 h-[100svh] md:h-full grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 px-2 md:px-4 opacity-95">
           {columns.map((colItems, colIndex) => (
-            <div key={colIndex} className="relative h-full overflow-hidden">
+            <div
+              key={colIndex}
+              className="relative h-[100svh] md:h-full overflow-hidden"
+            >
               <div
                 className={`flex flex-col gap-3 md:gap-4 ${
                   colIndex % 2 === 0 ? "scroll-col-up" : "scroll-col-down"
@@ -195,21 +195,6 @@ const Welcome = () => {
                   className="px-6 py-3 rounded-full bg-red-600 text-white font-semibold inline-flex items-center hover:bg-red-700 transition-colors duration-200"
                 >
                   Go to Home
-
-                  <svg
-                    className="ml-3 -mr-1 w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 12h14M12 5l7 7-7 7"
-                    />
-                  </svg>
                 </button>
               </div>
 
