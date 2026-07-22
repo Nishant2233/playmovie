@@ -1,116 +1,220 @@
 import useMovieList from "../hooks/UseMovies"
 import { useNavigate } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+
+const COL_COUNT = 6
+const ROWS_PER_COL = 5
 
 const Welcome = () => {
   const { movieLists } = useMovieList(undefined, 1)
   const navigate = useNavigate()
 
-  // typewriter state for the PlayMovie word (run once on mount)
-  const fullWord = 'PlayMovie'
-  const [displayedWord, setDisplayedWord] = useState('')
-  const [typingDone, setTypingDone] = useState(false)
+  const fullWord = "PlayMovie"
 
+  const [displayedWord, setDisplayedWord] = useState("")
+  const [typingDone, setTypingDone] = useState(false)
+  const [showContent, setShowContent] = useState(false)
+
+  // Show content after 2 seconds
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowContent(true)
+    }, 2000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Typewriter effect
+  useEffect(() => {
+    if (!showContent) return
+
     let idx = 0
-    const speed = 90 // ms per char
+
     const interval = setInterval(() => {
       idx++
       setDisplayedWord(fullWord.slice(0, idx))
+
       if (idx >= fullWord.length) {
         clearInterval(interval)
         setTypingDone(true)
       }
-    }, speed)
-    return () => clearInterval(interval)
-  }, [])
+    }, 120)
 
-  // pick first 24 movies for a full-bleed collage (6 cols x 4 rows)
-  const cards = movieLists ? movieLists.slice(0, 24) : []
+    return () => clearInterval(interval)
+  }, [showContent])
+
+  const columns = useMemo(() => {
+    const pool = movieLists?.length ? movieLists : []
+
+    return Array.from({ length: COL_COUNT }, (_, col) => {
+      const items = Array.from({ length: ROWS_PER_COL }, (_, row) => {
+        const idx = (col * ROWS_PER_COL + row) % Math.max(pool.length, 1)
+        return pool[idx] ?? null
+      })
+
+      return [...items, ...items]
+    })
+  }, [movieLists])
 
   return (
     <div className="min-h-screen relative bg-black text-white overflow-hidden">
-      {/* Background rows of movie cards (non-interactive) */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* subtle dark cover so foreground text stays readable (gradient left->right) */}
+      <style>{`
+        @keyframes scroll-up {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-50%); }
+        }
+
+        @keyframes scroll-down {
+          0% { transform: translateY(-50%); }
+          100% { transform: translateY(0); }
+        }
+
+        .scroll-col-up {
+          animation: scroll-up 28s linear infinite;
+        }
+
+        .scroll-col-down {
+          animation: scroll-down 32s linear infinite;
+        }
+
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+
+        .type-caret::after {
+          content: '|';
+          display: inline-block;
+          margin-left: 4px;
+          animation: blink 1s steps(2, start) infinite;
+          color: rgba(167, 139, 250, 0.95);
+        }
+
+        .type-caret.done::after {
+          display: none;
+        }
+
+        @keyframes zoom-out-in {
+          0% {
+            opacity: 0;
+            transform: scale(1.15);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .zoom-out-in {
+          animation: zoom-out-in 0.8s ease-out forwards;
+        }
+      `}</style>
+
+      {/* Poster background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+
+        {/* Dark overlay (gets darker when content appears) */}
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 z-10 transition-all duration-700"
           style={{
-            zIndex: 10,
-            background: 'linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0.15) 100%)'
+            background: showContent
+              ? "linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.58) 40%, rgba(0,0,0,0.42) 65%, rgba(0,0,0,0.62) 100%)"
+              : "linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.2) 65%, rgba(0,0,0,0.45) 100%)",
           }}
         />
 
-        <style>{`
-          @keyframes float { 0% { transform: translateY(0);} 50% { transform: translateY(-6px);} 100% { transform: translateY(0);} }
-          .float { animation: float 10s ease-in-out infinite; }
-          @keyframes blink { 0% { opacity: 1 } 50% { opacity: 0 } 100% { opacity: 1 } }
-          .type-caret::after { content: '|'; display: inline-block; margin-left: 6px; animation: blink 1s steps(2, start) infinite; color: rgba(255,255,255,0.85); }
-          .type-caret.done::after { display: none; }
-        `}</style>
+        <div
+          className="absolute inset-0 z-10"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.4) 100%)",
+          }}
+        />
 
-  {/* collage grid: responsive - 3 cols on mobile, 6 on md+; fills viewport on mobile */}
-  <div 
-    id="welcome-cards-container"
-    className={`grid grid-cols-3 md:grid-cols-6 gap-[3px] p-2 md:gap-[12px] md:p-6 h-full min-h-screen items-center justify-items-center pointer-events-none relative`}
-    style={{ zIndex: 0 }}
-  >
-          {Array.from({ length: 24 }).map((_, i) => {
-            const m = cards[i]
-            const col = i % 6
-            const row = Math.floor(i / 6) // 0..3
-            // tilt rows: left side down / right side up for even rows, opposite for odd rows
-            const rowRotate = row % 2 === 0 ? '-3deg' : '3deg'
-            // horizontal shift per row (even rows shift left, odd rows shift right)
-            const rowShift = row % 2 === 0 ? -40 : 40
-            // small per-item variation
-            const itemRotate = (col % 2 === 0) ? '-0.6deg' : '0.6deg'
-            const translateY = (col % 3 === 1) ? 10 : 0
-            // z-index so top rows appear above lower rows
-            const z = 100 - row
-            return (
+        <div className="absolute inset-0 grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 px-2 md:px-4 opacity-95">
+          {columns.map((colItems, colIndex) => (
+            <div key={colIndex} className="relative h-full overflow-hidden">
               <div
-                key={i}
-                className={`w-full h-44 sm:h-56 md:h-72 overflow-hidden rounded-lg shadow-lg float`}
-                style={{ 
-                  transform: `translateX(${rowShift}px) rotate(${rowRotate}) translateY(${translateY}px) rotate(${itemRotate})`, 
-                  filter: 'brightness(0.82)', 
-                  backgroundColor: '#111', 
-                  zIndex: z
-                }}
+                className={`flex flex-col gap-3 md:gap-4 ${
+                  colIndex % 2 === 0 ? "scroll-col-up" : "scroll-col-down"
+                }`}
+                style={{ animationDuration: `${24 + colIndex * 3}s` }}
               >
-                {m ? (
-                  <img src={`https://image.tmdb.org/t/p/w500${m.poster_path}`} alt={m.title || m.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-gray-800" />
-                )}
+                {colItems.map((movie, i) => (
+                  <div
+                    key={`${colIndex}-${i}`}
+                    className="w-full aspect-[2/3] shrink-0 overflow-hidden rounded-xl border border-white/5 shadow-lg"
+                    style={{ filter: "brightness(0.92) saturate(1)" }}
+                  >
+                    {movie?.poster_path ? (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                        alt={movie.title || movie.name || "Movie"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-neutral-900" />
+                    )}
+                  </div>
+                ))}
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
       </div>
 
-  {/* Foreground content */}
-    <div 
-      className="relative z-20 flex flex-col justify-center min-h-screen px-4 md:px-12 lg:px-20"
-    >
-    <div className="w-full mx-auto text-center">
-          <h1 className="mb-4 w-full text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-tight whitespace-nowrap">
-            <span className="text-white">Welcome to </span>
-            <span className={`type-caret ${typingDone ? 'done' : ''} text-blue-400   bg-black/30 shadow-md`}>{displayedWord}</span>
-          </h1>
-          <p className="max-w-xl text-white/80 mb-8 mx-auto text-center">Browse trending movies and TV shows, build a watchlist, and enjoy an immersive experience.</p>
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={() => navigate('/home')}
-              className="px-6 py-3 rounded-full text-white font-semibold bg-gradient-to-r from-red-900 to-red-700 hover:from-red-800 hover:to-red-600 inline-flex items-center"
-            >
-              Go to Home
-              <svg className="ml-3 -mr-1 w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
+      {/* Foreground */}
+      <div className="relative z-20 flex flex-col justify-center min-h-screen px-4 md:px-12 lg:px-20">
+        <div className="w-full mx-auto text-center">
+
+          {showContent && (
+            <div className="zoom-out-in">
+
+              {/* Heading */}
+              <h1 className="mb-6 text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
+                <span className="text-[#E5DDFF]">Welcome to </span>
+
+                <span
+                  className={`type-caret ${
+                    typingDone ? "done" : ""
+                  } inline-flex items-center px-4 py-1 rounded-full border border-purple-300/20 bg-white/10 backdrop-blur-md text-[#A78BFA] shadow-[0_8px_24px_rgba(124,58,237,0.22),inset_0_1px_0_rgba(255,255,255,0.08)]`}
+                >
+                  {displayedWord}
+                </span>
+              </h1>
+
+              {/* Description */}
+              <p className="max-w-xl mx-auto mb-8 text-white/90 text-sm md:text-base">
+                Browse trending movies and TV shows, build a watchlist, and enjoy an immersive experience.
+              </p>
+
+              {/* Button */}
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={() => navigate("/home")}
+                  className="px-6 py-3 rounded-full bg-red-600 text-white font-semibold inline-flex items-center hover:bg-red-700 transition-colors duration-200"
+                >
+                  Go to Home
+
+                  <svg
+                    className="ml-3 -mr-1 w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 12h14M12 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+            </div>
+          )}
         </div>
       </div>
     </div>
