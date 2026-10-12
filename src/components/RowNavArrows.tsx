@@ -35,6 +35,8 @@ export default function RowNavArrows({ canScrollLeft, canScrollRight, onScrollLe
 
 export function useHorizontalRowScroll(deps: unknown[] = []) {
   const scrollerRef = useRef<HTMLDivElement>(null)
+  const animationFrameRef = useRef<number | null>(null)
+  const previousScrollBehaviorRef = useRef<string | null>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
 
@@ -57,6 +59,11 @@ export function useHorizontalRowScroll(deps: unknown[] = []) {
     window.addEventListener("resize", run)
     return () => {
       window.clearTimeout(t)
+      if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current)
+      if (previousScrollBehaviorRef.current !== null) {
+        el.style.scrollBehavior = previousScrollBehaviorRef.current
+        previousScrollBehaviorRef.current = null
+      }
       el.removeEventListener("scroll", run)
       window.removeEventListener("resize", run)
     }
@@ -67,8 +74,37 @@ export function useHorizontalRowScroll(deps: unknown[] = []) {
     const el = scrollerRef.current
     if (!el) return
     const amount = Math.max(el.clientWidth * 0.85, 320)
-    el.scrollBy({ left: direction === "left" ? -amount : amount, behavior: "smooth" })
-    window.setTimeout(updateScrollState, 280)
+    const start = el.scrollLeft
+    const target = start + (direction === "left" ? -amount : amount)
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const duration = reducedMotion ? 800 : 1100
+
+    if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current)
+    animationFrameRef.current = null
+
+    if (previousScrollBehaviorRef.current === null) {
+      previousScrollBehaviorRef.current = el.style.scrollBehavior
+    }
+    el.style.scrollBehavior = "auto"
+    const startedAt = performance.now()
+    const animate = (now: number) => {
+      const progress = Math.min((now - startedAt) / duration, 1)
+      const eased = progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2
+      el.scrollLeft = start + (target - start) * eased
+
+      if (progress < 1) {
+        animationFrameRef.current = requestAnimationFrame(animate)
+      } else {
+        animationFrameRef.current = null
+        el.style.scrollBehavior = previousScrollBehaviorRef.current ?? ""
+        previousScrollBehaviorRef.current = null
+        updateScrollState()
+      }
+    }
+
+    animationFrameRef.current = requestAnimationFrame(animate)
   }
 
   return { scrollerRef, canScrollLeft, canScrollRight, scrollByPage, updateScrollState }

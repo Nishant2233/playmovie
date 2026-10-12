@@ -28,7 +28,7 @@ const BrandMark = ({ onClick }: { onClick?: () => void }) => (
 )
 
 const GLASS_PILL =
-  "rounded-[2rem] border border-white/10 bg-[#0b0b0b]/65 shadow-[0_8px_32px_rgba(0,0,0,0.45)] backdrop-blur-xl backdrop-saturate-150"
+  "rounded-[2rem] border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.45)] backdrop-blur-xl backdrop-saturate-150"
 
 const Navbar = () => {
   const navigate = useNavigate()
@@ -105,12 +105,13 @@ const Navbar = () => {
   if (location.pathname === "/") return null
 
   const headerStyle: React.CSSProperties | undefined =
-    isHome && isLargeScreen
+    isHome
       ? {
           background: solid
-            ? `linear-gradient(to bottom, color-mix(in srgb, ${glowColor} 38%, rgba(0,0,0,0.82)) 0%, rgba(0,0,0,0.92) 100%)`
-            : `radial-gradient(ellipse 90% 140% at 50% -40%, color-mix(in srgb, ${glowColor} 62%, transparent) 0%, transparent 62%), linear-gradient(to bottom, color-mix(in srgb, ${glowColor} 22%, rgba(0,0,0,0.15)) 0%, rgba(0,0,0,0.08) 100%)`,
-          transition: "background 1s ease",
+            ? `linear-gradient(to bottom, color-mix(in srgb, ${glowColor} 48%, rgba(8, 8, 8, 0.86)) 0%, color-mix(in srgb, ${glowColor} 30%, rgba(8, 8, 8, 0.8)) 100%)`
+            : `linear-gradient(to bottom, color-mix(in srgb, ${glowColor} 52%, rgba(8, 8, 8, 0.76)) 0%, color-mix(in srgb, ${glowColor} 34%, rgba(8, 8, 8, 0.58)) 100%)`,
+          backdropFilter: "blur(16px) saturate(1.2)",
+          transition: "background 700ms ease, backdrop-filter 700ms ease",
         }
       : undefined
 
@@ -136,8 +137,16 @@ const Navbar = () => {
         </div>
 
         {/* Desktop glass pill navbar */}
-        <div className="hidden px-6 pb-3 pt-2 lg:block xl:px-10">
-          <div className={`mx-auto flex w-full max-w-6xl items-center gap-0.5 px-3 py-2 ${GLASS_PILL}`}>
+        <div className="hidden px-6 pb-6 pt-2 lg:block xl:px-10">
+          <div
+            className={`mx-auto flex w-full max-w-6xl items-center gap-0.5 px-3 py-2 ${GLASS_PILL}`}
+            style={{
+              background: isHome && isLargeScreen
+                ? `color-mix(in srgb, ${glowColor} 34%, rgba(10, 10, 10, 0.76))`
+                : "rgba(11, 11, 11, 0.65)",
+              transition: "background 700ms ease",
+            }}
+          >
             <button type="button" onClick={goHome} className="mr-1 shrink-0" aria-label="PlayMovie home">
               <img src={pmlogo} alt="PlayMovie" className="h-10 w-10 rounded-full object-cover ring-1 ring-white/10" />
             </button>
