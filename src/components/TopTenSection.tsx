@@ -1,7 +1,7 @@
-import { useRef, useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import apiClient from "../services/api-client"
+import RowNavArrows, { useHorizontalRowScroll } from "./RowNavArrows"
 
 type SlidingSectionProps = {
   title: string
@@ -11,77 +11,33 @@ type SlidingSectionProps = {
 
 const SlidingSection = ({ title, items, type }: SlidingSectionProps) => {
   const navigate = useNavigate()
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
-
-  useEffect(() => {
-    const checkScroll = () => {
-      if (!scrollRef.current) return
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
-      const hasMoreContent = scrollWidth > clientWidth
-      setCanScrollLeft(scrollLeft > 10)
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10 && hasMoreContent)
-    }
-
-    setTimeout(checkScroll, 100)
-    
-    const scrollElement = scrollRef.current
-    scrollElement?.addEventListener('scroll', checkScroll)
-    window.addEventListener('resize', checkScroll)
-
-    return () => {
-      scrollElement?.removeEventListener('scroll', checkScroll)
-      window.removeEventListener('resize', checkScroll)
-    }
-  }, [items])
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (!scrollRef.current) return
-    const cardWidth = 400
-    const scrollAmount = cardWidth * 2
-    scrollRef.current.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth'
-    })
-    
-    setTimeout(() => {
-      if (!scrollRef.current) return
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
-      setCanScrollLeft(scrollLeft > 10)
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
-    }, 100)
-  }
+  const { scrollerRef, canScrollLeft, canScrollRight, scrollByPage } = useHorizontalRowScroll([items.length])
 
   if (items.length === 0) return null
 
   return (
     <div className="px-0 md:px-10 mb-10">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="w-1 h-6 bg-[var(--accent)]" />
-        <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="w-1 h-6 bg-[var(--accent)] shrink-0" />
+          <h2 className="text-2xl md:text-3xl font-bold truncate">{title}</h2>
+        </div>
+        <RowNavArrows
+          canScrollLeft={canScrollLeft}
+          canScrollRight={canScrollRight}
+          onScrollLeft={() => scrollByPage("left")}
+          onScrollRight={() => scrollByPage("right")}
+        />
       </div>
-      
-      <div className="relative">
-        {/* Left Arrow */}
-        <button
-          onClick={() => scroll('left')}
-          className={`absolute left-0 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-black/80 hover:bg-black backdrop-blur-md border border-white/30 flex items-center justify-center text-white transition-all shadow-lg ${
-            canScrollLeft ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
-          aria-label="Scroll left"
-        >
-          <ChevronLeft className="w-7 h-7" />
-        </button>
 
-        {/* Scrollable Container */}
+      <div className="relative">
         <div
-          ref={scrollRef}
+          ref={scrollerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
-          style={{ 
-            scrollbarWidth: 'none', 
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch'
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {items.map((item, index) => {
@@ -142,24 +98,7 @@ const SlidingSection = ({ title, items, type }: SlidingSectionProps) => {
             )
           })}
         </div>
-
-        {/* Right Arrow */}
-        <button
-          onClick={() => scroll('right')}
-          className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-black/80 hover:bg-black backdrop-blur-md border border-white/30 flex items-center justify-center text-white transition-all shadow-lg ${
-            canScrollRight ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
-          aria-label="Scroll right"
-        >
-          <ChevronRight className="w-7 h-7" />
-        </button>
       </div>
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   )
 }

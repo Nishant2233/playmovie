@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import MovieCard from "./MovieCard"
 import TvShowCard from "./TvShowCard"
+import RowNavArrows, { useHorizontalRowScroll } from "./RowNavArrows"
 
 type Kind = "movie" | "tv" | "mixed"
 
@@ -27,11 +28,15 @@ export default function HorizontalInfiniteRow({
   initialPage = 1,
   className
 }: Props) {
-  const scrollerRef = useRef<HTMLDivElement>(null)
   const [items, setItems] = useState<any[]>(initialItems || [])
   const [page, setPage] = useState(initialPage)
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
+
+  const { scrollerRef, canScrollLeft, canScrollRight, scrollByPage, updateScrollState } = useHorizontalRowScroll([
+    items.length,
+    loading
+  ])
 
   useEffect(() => {
     let cancelled = false
@@ -66,6 +71,7 @@ export default function HorizontalInfiniteRow({
       }
     } finally {
       setLoading(false)
+      updateScrollState()
     }
   }
 
@@ -82,15 +88,23 @@ export default function HorizontalInfiniteRow({
 
   return (
     <div className={`px-2 md:px-10 mb-10 w-full max-w-full ${className || ""}`}>
-      <div className="flex items-center gap-2 mb-4">
-        <span className="w-1 h-6 bg-purple-600" />
-        <h2 className="text-2xl md:text-3xl font-bold">{title}</h2>
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="w-1 h-6 bg-purple-600 shrink-0" />
+          <h2 className="text-2xl md:text-3xl font-bold truncate">{title}</h2>
+        </div>
+        <RowNavArrows
+          canScrollLeft={canScrollLeft}
+          canScrollRight={canScrollRight}
+          onScrollLeft={() => scrollByPage("left")}
+          onScrollRight={() => scrollByPage("right")}
+        />
       </div>
 
       <div
         ref={scrollerRef}
         onScroll={onScroll}
-        className="flex gap-2 md:gap-4 overflow-x-auto pb-2 scroll-smooth"
+        className="flex gap-2 md:gap-4 overflow-x-auto pb-2 scroll-smooth scrollbar-hide"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
       >
         {items.map((it) => (
@@ -105,11 +119,6 @@ export default function HorizontalInfiniteRow({
           </div>
         )}
       </div>
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-      `}</style>
     </div>
   )
 }
-

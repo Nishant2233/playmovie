@@ -1,12 +1,14 @@
 import HeroCarousel from '../HeroCarousel'
 import useTrandingList from '../../hooks/useTrandingList'
 import ContinueWatching from '../ContinueWatching'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import apiClient from '../../services/api-client'
 import HorizontalInfiniteRow from '../HorizontalInfiniteRow'
 import TopTenSection from '../TopTenSection'
+import { useHeroAmbience } from '../../contex/heroAmbience.context'
 
 const Tranding = () => {
+  const { glowColor } = useHeroAmbience()
   const trendingMovies = useTrandingList('movie').trandingData
   const trendingTv = useTrandingList('tv').trandingData
   const [topImdbSeed, setTopImdbSeed] = useState<any[]>([])
@@ -86,8 +88,21 @@ const Tranding = () => {
     const r = await apiClient.get('/trending/tv/day', { params: { page } })
     return r.data?.results || []
   }
+  const pageAmbience = useMemo(
+    () =>
+      ({
+        ["--hero-glow" as string]: glowColor,
+        background: `
+          radial-gradient(ellipse 100% 42% at 50% 0%, color-mix(in srgb, var(--hero-glow) 55%, transparent) 0%, transparent 72%),
+          linear-gradient(to bottom, color-mix(in srgb, var(--hero-glow) 22%, #030303) 0%, #000 22%, #000 100%)
+        `,
+        transition: "background 1s ease",
+      }) as CSSProperties,
+    [glowColor]
+  )
+
   return (
-    <div>
+    <div className="relative min-h-screen" style={pageAmbience}>
       <HeroCarousel />
       <ContinueWatching />
       <HorizontalInfiniteRow title="Trending Movies" kind="movie" initialItems={(trendingMovies || []).slice(0, 10)} fetchPage={fetchTrendingMovies} />

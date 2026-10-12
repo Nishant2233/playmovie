@@ -11,6 +11,7 @@ import { SharedWatchlistProvider } from './contex/sharedWatchlist.context.tsx'
 import { DetailsProvider } from './contex/details.context.tsx'
 import { WatchProgressProvider } from './contex/watchProgress.context.tsx'
 import { FilterProvider } from './contex/filters.context.tsx'
+import { HeroAmbienceProvider } from './contex/heroAmbience.context.tsx'
  
 
 
@@ -25,7 +26,9 @@ createRoot(document.getElementById('root')!).render(
     <WatchProgressProvider>
     <FilterProvider>
     <DetailsProvider>
+    <HeroAmbienceProvider>
       <App />
+    </HeroAmbienceProvider>
     </DetailsProvider>
     </FilterProvider>
     </WatchProgressProvider>
